@@ -1,35 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<title>Primeiro acesso</title>
-<link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>Primeiro acesso</h1>
-<p>Você deve criar uma nova senha.</p>
-
-<input type="password" id="senha1" placeholder="Nova senha">
-<input type="password" id="senha2" placeholder="Confirmar senha">
-
-<br><br>
-
-<button onclick="salvar()">Salvar nova senha</button>
-
-</div>
-
-<script>
-
-/* proteção */
-if(localStorage.getItem("logado")!=="sim"){
-window.location="login.html"
-}
-
-/* salvar senha nova */
 function salvar(){
 
 const s1 = document.getElementById("senha1").value
@@ -45,36 +13,35 @@ alert("As senhas não coincidem")
 return
 }
 
-/* pegar usuário logado (OBJETO JSON) */
 const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
-
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || []
 
-/* encontrar usuário na lista */
-const index = usuarios.findIndex(u => u.nome === usuarioLogado.nome)
+let index = usuarios.findIndex(u => u.nome === usuarioLogado.nome)
 
+/* ⭐ SE NÃO EXISTIR, CRIA */
 if(index === -1){
-alert("Erro ao localizar usuário")
-return
-}
 
-/* atualizar senha */
+usuarios.push({
+nome: usuarioLogado.nome,
+senha: btoa(s1),
+unidade: usuarioLogado.unidade || "",
+primeiroAcesso:false
+})
+
+}else{
+
 usuarios[index].senha = btoa(s1)
 usuarios[index].primeiroAcesso = false
 
+}
+
 localStorage.setItem("usuarios", JSON.stringify(usuarios))
 
-/* atualizar sessão também */
 usuarioLogado.senha = btoa(s1)
 usuarioLogado.primeiroAcesso = false
 localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado))
 
 alert("Senha alterada com sucesso")
 
-window.location = "dashboard.html"
+window.location="dashboard.html"
 }
-
-</script>
-
-</body>
-</html>
