@@ -1,3 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Primeiro acesso</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Primeiro acesso</h1>
+<p>Você deve criar uma nova senha.</p>
+
+<input type="password" id="senha1" placeholder="Nova senha">
+<input type="password" id="senha2" placeholder="Confirmar senha">
+
+<br><br>
+
+<button onclick="salvar()">Salvar nova senha</button>
+
+</div>
+
+<script>
+
+if(localStorage.getItem("logado")!=="sim"){
+window.location="login.html"
+}
+
 function salvar(){
 
 const s1 = document.getElementById("senha1").value
@@ -13,35 +43,34 @@ alert("As senhas não coincidem")
 return
 }
 
-const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
+let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || []
 
-let index = usuarios.findIndex(u => u.nome === usuarioLogado.nome)
+let usuario = usuarios.find(u => u.nome === usuarioLogado.nome)
 
-/* ⭐ SE NÃO EXISTIR, CRIA */
-if(index === -1){
-
-usuarios.push({
+if(!usuario){
+usuario = {
 nome: usuarioLogado.nome,
-senha: btoa(s1),
-unidade: usuarioLogado.unidade || "",
-primeiroAcesso:false
-})
-
-}else{
-
-usuarios[index].senha = btoa(s1)
-usuarios[index].primeiroAcesso = false
-
+unidade: usuarioLogado.unidade || ""
 }
+usuarios.push(usuario)
+}
+
+usuario.senha = btoa(s1)
+usuario.primeiroAcesso = false
 
 localStorage.setItem("usuarios", JSON.stringify(usuarios))
 
-usuarioLogado.senha = btoa(s1)
+usuarioLogado.senha = usuario.senha
 usuarioLogado.primeiroAcesso = false
 localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado))
 
 alert("Senha alterada com sucesso")
-
 window.location="dashboard.html"
+
 }
+
+</script>
+
+</body>
+</html>
