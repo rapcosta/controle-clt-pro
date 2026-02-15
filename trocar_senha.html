@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Trocar Senha</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Primeiro acesso</h1>
+<p>Você deve criar uma nova senha.</p>
+
+<input type="password" id="novaSenha" placeholder="Nova senha">
+<input type="password" id="confirmarSenha" placeholder="Confirmar senha">
+
+<br><br>
+
+<button onclick="salvar()">Salvar nova senha</button>
+
+</div>
+
+<script>
+
+function hash(texto){
+return btoa(texto)
+}
+
+/* bloquear acesso sem login */
+if(localStorage.getItem("logado")!=="sim"){
+window.location="login.html"
+}
+
+function salvar(){
+
+const senha1=document.getElementById("novaSenha").value
+const senha2=document.getElementById("confirmarSenha").value
+
+if(!senha1 || !senha2){
+alert("Preencha os campos")
+return
+}
+
+if(senha1!==senha2){
+alert("As senhas não coincidem")
+return
+}
+
+const usuario=localStorage.getItem("usuarioLogado")
+let usuarios=JSON.parse(localStorage.getItem("usuarios"))
+
+const index=usuarios.findIndex(u=>u.nome===usuario)
+
+usuarios[index].senha=hash(senha1)
+usuarios[index].primeiroAcesso=false
+
+localStorage.setItem("usuarios", JSON.stringify(usuarios))
+
+alert("Senha atualizada com sucesso")
+
+window.location="dashboard.html"
+}
+
+</script>
+
+</body>
+</html>

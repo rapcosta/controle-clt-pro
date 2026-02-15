@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Cadastro Completo de Funcionário</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+.form-container{
+max-width:1000px;
+margin:40px auto;
+background:#1f1f1f;
+padding:30px;
+border-radius:8px;
+}
+
+.secao{
+margin-bottom:35px;
+}
+
+.secao h2{
+border-bottom:1px solid #444;
+padding-bottom:6px;
+margin-bottom:15px;
+}
+
+.linha{
+display:flex;
+gap:20px;
+margin-bottom:12px;
+flex-wrap:wrap;
+}
+
+.campo{
+flex:1;
+min-width:220px;
+display:flex;
+flex-direction:column;
+}
+
+.campo label{
+margin-bottom:5px;
+font-size:14px;
+}
+
+.campo input, .campo select{
+padding:8px;
+border-radius:4px;
+border:none;
+}
+
+.botoes{
+margin-top:30px;
+display:flex;
+gap:15px;
+}
+
+button{
+padding:10px 20px;
+cursor:pointer;
+border:none;
+border-radius:5px;
+}
+
+.btn-voltar{
+background:#444;
+color:white;
+}
+
+.btn-salvar{
+background:#0a84ff;
+color:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="form-container">
+<h1>Cadastro Completo do Funcionário</h1>
+
+<form onsubmit="salvar(event)">
+
+<!-- UNIDADE -->
+<div class="secao">
+<h2>Unidade do Funcionário</h2>
+
+<div class="linha">
+<div class="campo">
+<label>Unidade</label>
+<select id="unidadeFuncionario" required>
+<option value="">Selecione a unidade</option>
+<option>Sabará</option>
+<option>Ocidental</option>
+<option>Águas Lindas</option>
+<option>Cruzeiro da Fortaleza</option>
+<option>Guimarânia</option>
+</select>
+</div>
+</div>
+</div>
+
+<!-- EMPRESA -->
+<div class="secao">
+<h2>Empresa</h2>
+<div class="linha">
+<div class="campo">
+<label>Nome da Empresa</label>
+<input id="empresa">
+</div>
+<div class="campo">
+<label>CNPJ</label>
+<input id="cnpj">
+</div>
+</div>
+</div>
+
+<!-- DADOS PESSOAIS -->
+<div class="secao">
+<h2>Dados Pessoais</h2>
+
+<div class="linha">
+<div class="campo"><label>Nome completo</label><input id="nome"></div>
+<div class="campo"><label>Data nascimento</label><input type="date" id="nascimento"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>Naturalidade</label><input id="naturalidade"></div>
+<div class="campo"><label>Nacionalidade</label><input id="nacionalidade"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>Estado civil</label><input id="estadoCivil"></div>
+<div class="campo"><label>Grau instrução</label><input id="instrucao"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>Nome do pai</label><input id="nomePai"></div>
+<div class="campo"><label>Nome da mãe</label><input id="nomeMae"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>Raça / cor</label><input id="raca"></div>
+<div class="campo">
+<label>Deficiência</label>
+<select id="deficiencia">
+<option>Não</option>
+<option>Sim</option>
+</select>
+</div>
+</div>
+</div>
+
+<!-- ENDEREÇO -->
+<div class="secao">
+<h2>Endereço e Contato</h2>
+
+<div class="linha">
+<div class="campo"><label>Endereço</label><input id="endereco"></div>
+<div class="campo"><label>Bairro</label><input id="bairro"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>Cidade</label><input id="cidade"></div>
+<div class="campo"><label>UF</label><input id="uf"></div>
+<div class="campo"><label>CEP</label><input id="cep"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>Telefone</label><input id="telefone"></div>
+<div class="campo"><label>Celular</label><input id="celular"></div>
+<div class="campo"><label>Email</label><input id="email"></div>
+</div>
+</div>
+
+<!-- DOCUMENTOS -->
+<div class="secao">
+<h2>Documentação</h2>
+
+<div class="linha">
+<div class="campo"><label>CPF</label><input id="cpf"></div>
+<div class="campo"><label>RG</label><input id="rg"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>PIS / PASEP</label><input id="pis"></div>
+<div class="campo"><label>CTPS</label><input id="ctps"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>Título eleitor</label><input id="tituloEleitor"></div>
+<div class="campo"><label>Reservista</label><input id="reservista"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>CNH</label><input id="cnh"></div>
+</div>
+</div>
+
+<!-- CONTRATO -->
+<div class="secao">
+<h2>Dados Contratuais</h2>
+
+<div class="linha">
+<div class="campo"><label>Admissão</label><input type="date" id="admissao"></div>
+<div class="campo"><label>Cargo</label><input id="cargo"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>CBO</label><input id="cbo"></div>
+<div class="campo"><label>Setor</label><input id="setor"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>Salário</label><input type="number" id="salario"></div>
+<div class="campo"><label>Tipo contrato</label><input id="tipoContrato"></div>
+</div>
+
+<div class="linha">
+<div class="campo"><label>Horário trabalho</label><input id="horario"></div>
+<div class="campo"><label>Intervalo</label><input id="intervalo"></div>
+<div class="campo"><label>DSR</label><input id="dsr"></div>
+</div>
+</div>
+
+<!-- BANCO -->
+<div class="secao">
+<h2>Dados Bancários</h2>
+<div class="linha">
+<div class="campo"><label>Banco</label><input id="banco"></div>
+<div class="campo"><label>Agência</label><input id="agencia"></div>
+<div class="campo"><label>Conta</label><input id="conta"></div>
+</div>
+</div>
+
+<!-- BOTÕES -->
+<div class="botoes">
+<button type="submit" class="btn-salvar">Salvar Funcionário</button>
+<button type="button" class="btn-voltar" onclick="voltar()">Voltar ao Painel</button>
+</div>
+
+</form>
+</div>
+
+<script>
+
+/* PROTEÇÃO LOGIN */
+if(localStorage.getItem("logado")!=="sim"){
+window.location="login.html"
+}
+
+/* SALVAR */
+function salvar(e){
+e.preventDefault()
+
+const unidadeFuncionario = document.getElementById("unidadeFuncionario").value
+
+if(!unidadeFuncionario){
+alert("Selecione a unidade do funcionário")
+return
+}
+
+let lista = JSON.parse(localStorage.getItem("funcionarios")) || []
+
+lista.push({
+unidade: unidadeFuncionario,
+empresa:empresa.value,
+cnpj:cnpj.value,
+nome:nome.value,
+nascimento:nascimento.value,
+naturalidade:naturalidade.value,
+nacionalidade:nacionalidade.value,
+estadoCivil:estadoCivil.value,
+nomePai:nomePai.value,
+nomeMae:nomeMae.value,
+instrucao:instrucao.value,
+raca:raca.value,
+deficiencia:deficiencia.value,
+endereco:endereco.value,
+bairro:bairro.value,
+cidade:cidade.value,
+uf:uf.value,
+cep:cep.value,
+telefone:telefone.value,
+celular:celular.value,
+email:email.value,
+cpf:cpf.value,
+rg:rg.value,
+pis:pis.value,
+ctps:ctps.value,
+tituloEleitor:tituloEleitor.value,
+reservista:reservista.value,
+cnh:cnh.value,
+admissao:admissao.value,
+cargo:cargo.value,
+cbo:cbo.value,
+setor:setor.value,
+salario:Number(salario.value),
+tipoContrato:tipoContrato.value,
+horario:horario.value,
+intervalo:intervalo.value,
+dsr:dsr.value,
+banco:banco.value,
+agencia:agencia.value,
+conta:conta.value
+})
+
+localStorage.setItem("funcionarios", JSON.stringify(lista))
+
+alert("Funcionário cadastrado com sucesso")
+window.location="funcionarios.html"
+}
+
+/* VOLTAR */
+function voltar(){
+window.location="dashboard.html"
+}
+
+</script>
+
+</body>
+</html>

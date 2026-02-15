@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Gerar Contracheque</title>
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+.contracheque{
+width:190mm;
+min-height:260mm;
+background:white;
+color:black;
+padding:15mm;
+font-size:12px;
+box-sizing:border-box;
+margin-bottom:10mm;
+font-family:Arial;
+}
+
+.linha{
+display:flex;
+justify-content:space-between;
+margin-bottom:4px;
+}
+
+.tabela{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+.tabela th{
+background:#eee;
+}
+
+.tabela td,.tabela th{
+border:1px solid black;
+padding:4px;
+text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Gerar Contracheque</h1>
+<h3 id="nomeFuncionario"></h3>
+
+<label>Mês:</label>
+<input type="number" id="mes">
+
+<label>Ano:</label>
+<input type="number" id="ano">
+
+<label>Faltas injustificadas:</label>
+<input type="number" id="faltasInjust" value="0">
+
+<label>Dependentes IRRF:</label>
+<input type="number" id="dependentes" value="0">
+
+<br><br>
+
+<button type="button" onclick="calcular()">Calcular</button>
+<button type="button" onclick="gerarPDF()">Gerar PDF</button>
+<button type="button" onclick="voltar()">Voltar</button>
+
+<hr>
+<div id="pdfArea"></div>
+
+</div>
+
+<script>
+
+/* login */
+if(localStorage.getItem("logado")!=="sim"){
+window.location="login.html"
+}
+
+/* funcionário */
+const index = localStorage.getItem("funcionarioSelecionado")
+const funcionarios = JSON.parse(localStorage.getItem("funcionarios")) || []
+const func = funcionarios[index]
+
+document.getElementById("nomeFuncionario").innerText = func.nome
+
+/* INSS */
+function calcularINSS(s){
+if(s<=1412) return s*0.075
+if(s<=2666.68) return 1412*0.075+(s-1412)*0.09
+if(s<=4000.03) return 1412*0.075+1254.68*0.09+(s-2666.68)*0.12
+return 1412*0.075+1254.68*0.09+1333.35*0.12+(s-4000.03)*0.14
+}
+
+/* IRRF */
+function calcularIRRF(base,dep){
+base-=dep*189.59
+if(base<=2112) return 0
+if(base<=2826.65) return base*0.075-158.40
+if(base<=3751.05) return base*0.15-370.40
+if(base<=4664.68) return base*0.225-651.73
+return base*0.275-884.96
+}
+
+/* CALCULAR */
+function calcular(){
+
+const mes=document.getElementById("mes").value
+const ano=document.getElementById("ano").value
+
+if(!mes||!ano){
+alert("Informe mês e ano")
+return
+}
+
+const salario=Number(func.salario||0)
+const faltas=Number(document.getElementById("faltasInjust").value)
+const dep=Number(document.getElementById("dependentes").value)
+
+const desc=(salario/30)*faltas
+const rem=salario-desc
+const inss=calcularINSS(rem)
+const irrf=calcularIRRF(rem-inss,dep)
+const fgts=rem*0.08
+const liq=rem-inss-irrf
+
+let html=""
+
+/* duas vias */
+for(let i=0;i<2;i++){
+
+html+=`
+<div class="contracheque">
+
+<div style="text-align:center;">
+<b>FACILITE GESTÃO EMPRESARIAL LTDA</b><br>
+CNPJ 00.000.000/0001-00
+</div>
+
+<hr>
+
+<div class="linha">
+<div>Funcionário: ${func.nome}</div>
+<div>Matrícula: ${index}</div>
+</div>
+
+<div class="linha">
+<div>CPF: ${func.cpf}</div>
+<div>Competência: ${mes}/${ano}</div>
+</div>
+
+<table class="tabela">
+<tr><th>Cód</th><th>Descrição</th><th>Venc</th><th>Desc</th></tr>
+<tr><td>001</td><td>Salário</td><td>${salario.toFixed(2)}</td><td></td></tr>
+<tr><td>101</td><td>Faltas</td><td></td><td>${desc.toFixed(2)}</td></tr>
+<tr><td>201</td><td>INSS</td><td></td><td>${inss.toFixed(2)}</td></tr>
+<tr><td>202</td><td>IRRF</td><td></td><td>${irrf.toFixed(2)}</td></tr>
+</table>
+
+<div class="linha">
+<div>FGTS: ${fgts.toFixed(2)}</div>
+<div><b>Líquido: ${liq.toFixed(2)}</b></div>
+</div>
+
+<br><br>
+_____________________________<br>
+Assinatura
+
+</div>
+`
+}
+
+document.getElementById("pdfArea").innerHTML=html
+
+}
+
+/* PDF */
+function gerarPDF(){
+const area=document.getElementById("pdfArea")
+if(area.innerHTML===""){
+alert("Calcule primeiro")
+return
+}
+html2pdf().from(area).save("contracheque.pdf")
+}
+
+function voltar(){
+window.location="funcionarios.html"
+}
+
+</script>
+
+</body>
+</html>
