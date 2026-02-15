@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Trocar Senha</title>
+<title>Primeiro acesso</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,8 +13,8 @@
 <h1>Primeiro acesso</h1>
 <p>Você deve criar uma nova senha.</p>
 
-<input type="password" id="novaSenha" placeholder="Nova senha">
-<input type="password" id="confirmarSenha" placeholder="Confirmar senha">
+<input type="password" id="senha1" placeholder="Nova senha">
+<input type="password" id="senha2" placeholder="Confirmar senha">
 
 <br><br>
 
@@ -24,43 +24,54 @@
 
 <script>
 
-function hash(texto){
-return btoa(texto)
-}
-
-/* bloquear acesso sem login */
+/* proteção */
 if(localStorage.getItem("logado")!=="sim"){
 window.location="login.html"
 }
 
+/* salvar senha nova */
 function salvar(){
 
-const senha1=document.getElementById("novaSenha").value
-const senha2=document.getElementById("confirmarSenha").value
+const s1 = document.getElementById("senha1").value
+const s2 = document.getElementById("senha2").value
 
-if(!senha1 || !senha2){
-alert("Preencha os campos")
+if(!s1 || !s2){
+alert("Preencha as duas senhas")
 return
 }
 
-if(senha1!==senha2){
+if(s1 !== s2){
 alert("As senhas não coincidem")
 return
 }
 
-const usuario=localStorage.getItem("usuarioLogado")
-let usuarios=JSON.parse(localStorage.getItem("usuarios"))
+/* pegar usuário logado (OBJETO JSON) */
+const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
 
-const index=usuarios.findIndex(u=>u.nome===usuario)
+let usuarios = JSON.parse(localStorage.getItem("usuarios")) || []
 
-usuarios[index].senha=hash(senha1)
-usuarios[index].primeiroAcesso=false
+/* encontrar usuário na lista */
+const index = usuarios.findIndex(u => u.nome === usuarioLogado.nome)
+
+if(index === -1){
+alert("Erro ao localizar usuário")
+return
+}
+
+/* atualizar senha */
+usuarios[index].senha = btoa(s1)
+usuarios[index].primeiroAcesso = false
 
 localStorage.setItem("usuarios", JSON.stringify(usuarios))
 
-alert("Senha atualizada com sucesso")
+/* atualizar sessão também */
+usuarioLogado.senha = btoa(s1)
+usuarioLogado.primeiroAcesso = false
+localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado))
 
-window.location="dashboard.html"
+alert("Senha alterada com sucesso")
+
+window.location = "dashboard.html"
 }
 
 </script>
