@@ -1,75 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Funcionários</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+background:#0f0f0f;
+color:white;
+font-family:Segoe UI, Arial;
+}
+
+.page{
+max-width:1200px;
+margin:40px auto;
+padding:20px;
+}
+
+.top-bar{
+display:flex;
+gap:10px;
+align-items:center;
+margin-bottom:20px;
+flex-wrap:wrap;
+}
+
+input, select{
+padding:10px;
+border-radius:6px;
+border:none;
+}
+
+.tabela{
+width:100%;
+border-collapse:collapse;
+background:#1b1b1b;
+border-radius:8px;
+overflow:hidden;
+}
+
+.tabela th{
+background:#2a2a2a;
+padding:12px;
+text-align:left;
+}
+
+.tabela td{
+padding:12px;
+border-top:1px solid #333;
+}
+
+.tabela tr:hover{
+background:#252525;
+}
+
+.acoes button{
+margin-right:6px;
+padding:6px 10px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+font-size:12px;
+}
+
+.btn-ver{ background:#3498db; color:white }
+.btn-editar{ background:#f39c12; color:black }
+.btn-contra{ background:#2ecc71; color:black }
+.btn-excluir{ background:#e74c3c; color:white }
+
+.footer{
+margin-top:20px;
+display:flex;
+justify-content:space-between;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<div class="top-bar">
+<h2>Funcionários</h2>
+
+<input type="text" id="busca" placeholder="Buscar por nome ou CPF...">
+
+<select id="filtroUnidade">
+<option value="">Todas as unidades</option>
+<option>Sabará</option>
+<option>Ocidental</option>
+<option>Águas Lindas</option>
+<option>Cruzeiro da Fortaleza</option>
+<option>Guimarânia</option>
+</select>
+</div>
+
+<table class="tabela">
+<thead>
+<tr>
+<th>Nome</th>
+<th>CPF</th>
+<th>Cargo</th>
+<th>Setor</th>
+<th style="width:250px">Ações</th>
+</tr>
+</thead>
+<tbody id="listaFuncionarios"></tbody>
+</table>
+
+<div class="footer">
+<button onclick="window.location='dashboard.html'">Voltar ao painel</button>
+<div id="paginacao"></div>
+</div>
+
+</div>
+
+<!-- ========================= -->
+<!-- SUPABASE LIB -->
+<!-- ========================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- ========================= -->
+<!-- CONEXÃO -->
+<!-- ========================= -->
+<script src="supabase.js"></script>
+
+<!-- ========================= -->
+<!-- TESTE -->
+<!-- ========================= -->
 <script>
 
-console.log("🔥 HTML CARREGADO")
+console.log("✅ HTML CARREGADO")
 
-/* proteção login */
-if(localStorage.getItem("logado")!=="sim"){
-window.location="login.html"
-}
+async function testarSupabase(){
 
-/* ========================= */
-/* BUSCAR FUNCIONÁRIOS DO BANCO */
-/* ========================= */
+console.log("🔥 TESTANDO SUPABASE")
 
-async function carregarFuncionarios(){
+try{
 
-console.log("🔥 BUSCANDO FUNCIONÁRIOS DO BANCO")
-
-const { data, error } = await supabaseClient
+const { data, error } = await supabase
 .from("funcionarios")
 .select("*")
-.order("nome")
 
-if(error){
-console.error("❌ ERRO AO BUSCAR:", error)
-return
+console.log("📦 DADOS DO BANCO:", data)
+console.log("❌ ERRO:", error)
+
+}catch(e){
+console.error("💥 ERRO GERAL:", e)
 }
-
-console.log("📦 FUNCIONÁRIOS:", data)
-
-mostrarTabela(data)
 
 }
 
-/* ========================= */
-/* MOSTRAR NA TABELA */
-/* ========================= */
-
-function mostrarTabela(lista){
-
-const tabela = document.getElementById("listaFuncionarios")
-
-if(!lista || lista.length===0){
-tabela.innerHTML = `
-<tr>
-<td colspan="5" style="text-align:center;padding:20px">
-Nenhum funcionário cadastrado
-</td>
-</tr>`
-return
-}
-
-let html=""
-
-lista.forEach(func=>{
-
-html+=`
-<tr>
-<td>${func.nome || "-"}</td>
-<td>${func.cpf || "-"}</td>
-<td>${func.cargo || "-"}</td>
-<td>${func.setor || "-"}</td>
-<td>-</td>
-</tr>
-`
-
-})
-
-tabela.innerHTML = html
-
-}
-
-/* iniciar */
-carregarFuncionarios()
+testarSupabase()
 
 </script>
+
+</body>
+</html>
