@@ -131,20 +131,22 @@ justify-content:space-between;
 <!-- ========================= -->
 <script>
 
-console.log("✅ HTML CARREGADO")
+console.log("🔥 HTML CARREGADO")
 
 async function testarSupabase(){
 
-console.log("TESTANDO SUPABASE")
+console.log("🔥 TESTANDO SUPABASE")
 
 const { data, error } = await supabaseClient
 .from("funcionarios")
 .select("*")
 
-console.log("DADOS:", data)
-console.log("ERRO:", error)
+console.log("📦 DADOS DO BANCO:", data)
+console.log("❌ ERRO:", error)
 
 }
+
+testarSupabase()
 
 
 </script>
