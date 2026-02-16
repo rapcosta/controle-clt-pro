@@ -135,24 +135,17 @@ console.log("✅ HTML CARREGADO")
 
 async function testarSupabase(){
 
-console.log("🔥 TESTANDO SUPABASE")
+console.log("TESTANDO SUPABASE")
 
-try{
-
-const { data, error } = await supabase
+const { data, error } = await supabaseClient
 .from("funcionarios")
 .select("*")
 
-console.log("📦 DADOS DO BANCO:", data)
-console.log("❌ ERRO:", error)
-
-}catch(e){
-console.error("💥 ERRO GERAL:", e)
-}
+console.log("DADOS:", data)
+console.log("ERRO:", error)
 
 }
 
-testarSupabase()
 
 </script>
 
