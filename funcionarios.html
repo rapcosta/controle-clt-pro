@@ -150,3 +150,26 @@ testarSupabase()
 
 </body>
 </html>
+<!-- 1 Biblioteca oficial Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- 2 Conexão do seu projeto -->
+<script src="supabase.js"></script>
+
+<!-- 3 Script da página -->
+<script>
+
+async function testarSupabase(){
+
+const { data, error } = await supabase
+.from("funcionarios")
+.select("*")
+
+console.log("DADOS DO BANCO:", data)
+console.log("ERRO:", error)
+
+}
+
+testarSupabase()
+
+</script>
