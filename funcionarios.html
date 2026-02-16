@@ -84,9 +84,9 @@ justify-content:space-between;
 <div class="top-bar">
 <h2>Funcionários</h2>
 
-<input type="text" id="busca" placeholder="Buscar por nome ou CPF..." onkeyup="filtrar()">
+<input type="text" id="busca" placeholder="Buscar por nome ou CPF...">
 
-<select id="filtroUnidade" onchange="filtrar()">
+<select id="filtroUnidade">
 <option value="">Todas as unidades</option>
 <option>Sabará</option>
 <option>Ocidental</option>
@@ -116,31 +116,39 @@ justify-content:space-between;
 
 </div>
 
+<!-- ========================= -->
 <!-- SUPABASE LIB -->
+<!-- ========================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- SUA CONEXÃO -->
+<!-- ========================= -->
+<!-- CONEXÃO -->
+<!-- ========================= -->
 <script src="supabase.js"></script>
 
+<!-- ========================= -->
+<!-- TESTE -->
+<!-- ========================= -->
 <script>
 
-/* proteção login */
-if(localStorage.getItem("logado")!=="sim"){
-window.location="login.html"
-}
-
-/* ========================= */
-/* TESTE SUPABASE */
-/* ========================= */
+console.log("✅ HTML CARREGADO")
 
 async function testarSupabase(){
+
+console.log("🔥 TESTANDO SUPABASE")
+
+try{
 
 const { data, error } = await supabase
 .from("funcionarios")
 .select("*")
 
-console.log("DADOS DO BANCO:", data)
-console.log("ERRO:", error)
+console.log("📦 DADOS DO BANCO:", data)
+console.log("❌ ERRO:", error)
+
+}catch(e){
+console.error("💥 ERRO GERAL:", e)
+}
 
 }
 
@@ -150,26 +158,3 @@ testarSupabase()
 
 </body>
 </html>
-<!-- 1 Biblioteca oficial Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- 2 Conexão do seu projeto -->
-<script src="supabase.js"></script>
-
-<!-- 3 Script da página -->
-<script>
-
-async function testarSupabase(){
-
-const { data, error } = await supabase
-.from("funcionarios")
-.select("*")
-
-console.log("DADOS DO BANCO:", data)
-console.log("ERRO:", error)
-
-}
-
-testarSupabase()
-
-</script>
