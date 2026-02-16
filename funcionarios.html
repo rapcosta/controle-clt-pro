@@ -6,7 +6,6 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-
 body{
 background:#0f0f0f;
 color:white;
@@ -75,7 +74,6 @@ margin-top:20px;
 display:flex;
 justify-content:space-between;
 }
-
 </style>
 </head>
 
@@ -96,7 +94,6 @@ justify-content:space-between;
 <option>Cruzeiro da Fortaleza</option>
 <option>Guimarânia</option>
 </select>
-
 </div>
 
 <table class="tabela">
@@ -109,7 +106,6 @@ justify-content:space-between;
 <th style="width:250px">Ações</th>
 </tr>
 </thead>
-
 <tbody id="listaFuncionarios"></tbody>
 </table>
 
@@ -120,144 +116,22 @@ justify-content:space-between;
 
 </div>
 
+<!-- SUPABASE LIB -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- SUA CONEXÃO -->
+<script src="supabase.js"></script>
+
 <script>
 
-/* ========================= */
-/* PROTEÇÃO LOGIN */
-/* ========================= */
+/* proteção login */
 if(localStorage.getItem("logado")!=="sim"){
 window.location="login.html"
 }
 
 /* ========================= */
-/* USUÁRIO LOGADO */
+/* TESTE SUPABASE */
 /* ========================= */
-const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
-
-let todosFuncionarios = JSON.parse(localStorage.getItem("funcionarios")) || []
-let funcionarios = []
-
-/* ========================= */
-/* CONTROLE DE VISUALIZAÇÃO */
-/* ========================= */
-
-if(usuarioLogado.nome === "admin"){
-funcionarios = todosFuncionarios
-}else{
-funcionarios = todosFuncionarios.filter(f => f.unidade === usuarioLogado.unidade)
-
-/* esconder filtro para usuários comuns */
-document.getElementById("filtroUnidade").style.display="none"
-}
-
-/* ========================= */
-/* PAGINAÇÃO */
-/* ========================= */
-
-let paginaAtual = 1
-const porPagina = 8
-
-function mostrar(lista){
-
-const inicio = (paginaAtual-1)*porPagina
-const fim = inicio+porPagina
-const pagina = lista.slice(inicio,fim)
-
-let html=""
-
-pagina.forEach(func=>{
-
-const index = todosFuncionarios.indexOf(func)
-
-html+=`
-<tr>
-<td>${func.nome || "-"}</td>
-<td>${func.cpf || "-"}</td>
-<td>${func.cargo || "-"}</td>
-<td>${func.setor || "-"}</td>
-<td class="acoes">
-<button class="btn-ver" onclick="verFicha(${index})">Ver</button>
-<button class="btn-editar" onclick="editar(${index})">Editar</button>
-<button class="btn-contra" onclick="contra(${index})">Contracheque</button>
-<button class="btn-excluir" onclick="excluir(${index})">Excluir</button>
-</td>
-</tr>`
-})
-
-listaFuncionarios.innerHTML=html
-paginacaoCriar(lista.length)
-}
-
-/* ========================= */
-/* FILTRO GERAL */
-/* ========================= */
-
-function filtrar(){
-
-const termo = busca.value.toLowerCase()
-const unidadeSelecionada = filtroUnidade.value
-
-let lista = funcionarios
-
-if(unidadeSelecionada){
-lista = lista.filter(f => f.unidade === unidadeSelecionada)
-}
-
-lista = lista.filter(f =>
-(f.nome||"").toLowerCase().includes(termo) ||
-(f.cpf||"").includes(termo)
-)
-
-mostrar(lista)
-}
-
-/* ========================= */
-/* PAGINAÇÃO */
-/* ========================= */
-
-function paginacaoCriar(total){
-const paginas = Math.ceil(total/porPagina)
-let html=""
-for(let i=1;i<=paginas;i++){
-html+=`<button onclick="irPagina(${i})">${i}</button>`
-}
-paginacao.innerHTML=html
-}
-
-function irPagina(p){
-paginaAtual=p
-filtrar()
-}
-
-/* ========================= */
-/* AÇÕES */
-/* ========================= */
-
-function verFicha(i){
-localStorage.setItem("funcionarioSelecionado",i)
-window.open("ficha.html","_blank")
-}
-
-function editar(i){
-localStorage.setItem("funcionarioEditando",i)
-window.open("ficha.html","_blank")
-}
-
-function contra(i){
-localStorage.setItem("funcionarioSelecionado",i)
-window.location="contracheque.html"
-}
-
-function excluir(i){
-if(confirm("Excluir funcionário?")){
-todosFuncionarios.splice(i,1)
-localStorage.setItem("funcionarios",JSON.stringify(todosFuncionarios))
-filtrar()
-}
-}
-
-/* iniciar */
-mostrar(funcionarios)
 
 async function testarSupabase(){
 
@@ -265,7 +139,7 @@ const { data, error } = await supabase
 .from("funcionarios")
 .select("*")
 
-console.log("DADOS:", data)
+console.log("DADOS DO BANCO:", data)
 console.log("ERRO:", error)
 
 }
@@ -274,9 +148,5 @@ testarSupabase()
 
 </script>
 
-
-
 </body>
-<script src="supabase.js"></script>
-
 </html>
