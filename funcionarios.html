@@ -1,160 +1,113 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<title>Funcionários</title>
-<link rel="stylesheet" href="style.css">
-
-<style>
-body{
-background:#0f0f0f;
-color:white;
-font-family:Segoe UI, Arial;
-}
-
-.page{
-max-width:1200px;
-margin:40px auto;
-padding:20px;
-}
-
-.top-bar{
-display:flex;
-gap:10px;
-align-items:center;
-margin-bottom:20px;
-flex-wrap:wrap;
-}
-
-input, select{
-padding:10px;
-border-radius:6px;
-border:none;
-}
-
-.tabela{
-width:100%;
-border-collapse:collapse;
-background:#1b1b1b;
-border-radius:8px;
-overflow:hidden;
-}
-
-.tabela th{
-background:#2a2a2a;
-padding:12px;
-text-align:left;
-}
-
-.tabela td{
-padding:12px;
-border-top:1px solid #333;
-}
-
-.tabela tr:hover{
-background:#252525;
-}
-
-.acoes button{
-margin-right:6px;
-padding:6px 10px;
-border:none;
-border-radius:5px;
-cursor:pointer;
-font-size:12px;
-}
-
-.btn-ver{ background:#3498db; color:white }
-.btn-editar{ background:#f39c12; color:black }
-.btn-contra{ background:#2ecc71; color:black }
-.btn-excluir{ background:#e74c3c; color:white }
-
-.footer{
-margin-top:20px;
-display:flex;
-justify-content:space-between;
-}
-</style>
-</head>
-
-<body>
-
-<div class="page">
-
-<div class="top-bar">
-<h2>Funcionários</h2>
-
-<input type="text" id="busca" placeholder="Buscar por nome ou CPF...">
-
-<select id="filtroUnidade">
-<option value="">Todas as unidades</option>
-<option>Sabará</option>
-<option>Ocidental</option>
-<option>Águas Lindas</option>
-<option>Cruzeiro da Fortaleza</option>
-<option>Guimarânia</option>
-</select>
-</div>
-
-<table class="tabela">
-<thead>
-<tr>
-<th>Nome</th>
-<th>CPF</th>
-<th>Cargo</th>
-<th>Setor</th>
-<th style="width:250px">Ações</th>
-</tr>
-</thead>
-<tbody id="listaFuncionarios"></tbody>
-</table>
-
-<div class="footer">
-<button onclick="window.location='dashboard.html'">Voltar ao painel</button>
-<div id="paginacao"></div>
-</div>
-
-</div>
-
-<!-- ========================= -->
-<!-- SUPABASE LIB -->
-<!-- ========================= -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- ========================= -->
-<!-- CONEXÃO -->
-<!-- ========================= -->
-<script src="supabase.js"></script>
-
-<!-- ========================= -->
-<!-- TESTE -->
-<!-- ========================= -->
 <script>
 
-console.log("✅ HTML CARREGADO")
+if(localStorage.getItem("logado")!=="sim"){
+location="login.html"
+}
 
-async function testarSupabase(){
+let funcionarios = []
 
-console.log("🔥 TESTANDO SUPABASE")
+/* ============================= */
+/* CARREGAR FUNCIONÁRIOS DO BANCO */
+/* ============================= */
+async function carregarFuncionarios(){
 
-try{
-
-const { data, error } = await supabase
+const { data, error } = await supabaseClient
 .from("funcionarios")
 .select("*")
+.order("nome",{ascending:true})
 
-console.log("📦 DADOS DO BANCO:", data)
-console.log("❌ ERRO:", error)
-
-}catch(e){
-console.error("💥 ERRO GERAL:", e)
+if(error){
+alert("Erro ao carregar funcionários")
+console.error(error)
+return
 }
 
+funcionarios = data
+renderTabela()
 }
 
-testarSupabase()
+/* ============================= */
+/* RENDERIZAR TABELA */
+/* ============================= */
+function renderTabela(){
+
+const lista = document.getElementById("listaFuncionarios")
+lista.innerHTML=""
+
+funcionarios.forEach((f,i)=>{
+
+lista.innerHTML += `
+<tr>
+<td>${f.nome || ""}</td>
+<td>${f.cpf || ""}</td>
+<td>${f.cargo || ""}</td>
+<td>${f.setor || ""}</td>
+
+<td class="acoes">
+
+<button class="btn-ver" onclick="ver(${i})">Ver</button>
+<button class="btn-editar" onclick="editar(${i})">Editar</button>
+<button class="btn-contra" onclick="contracheque(${i})">Contracheque</button>
+<button class="btn-excluir" onclick="excluir(${i})">Excluir</button>
+
+</td>
+</tr>
+`
+})
+
+}
+
+/* ============================= */
+/* VER FUNCIONÁRIO */
+/* ============================= */
+function ver(i){
+localStorage.setItem("funcionarioSelecionado", funcionarios[i].id)
+location="ficha.html"
+}
+
+/* ============================= */
+/* EDITAR FUNCIONÁRIO */
+/* ============================= */
+function editar(i){
+localStorage.setItem("funcionarioEditando", funcionarios[i].id)
+location="ficha.html"
+}
+
+/* ============================= */
+/* CONTRACHEQUE */
+/* ============================= */
+function contracheque(i){
+localStorage.setItem("funcionarioSelecionado", funcionarios[i].id)
+location="contracheque.html"
+}
+
+/* ============================= */
+/* EXCLUIR FUNCIONÁRIO */
+/* ============================= */
+async function excluir(i){
+
+if(!confirm("Excluir funcionário?")) return
+
+const id = funcionarios[i].id
+
+const { error } = await supabaseClient
+.from("funcionarios")
+.delete()
+.eq("id", id)
+
+if(error){
+alert("Erro ao excluir")
+console.error(error)
+return
+}
+
+alert("Funcionário excluído com sucesso")
+carregarFuncionarios()
+}
+
+/* ============================= */
+/* INICIAR */
+/* ============================= */
+carregarFuncionarios()
 
 </script>
-
-</body>
-</html>
