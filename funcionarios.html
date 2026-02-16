@@ -259,7 +259,24 @@ filtrar()
 /* iniciar */
 mostrar(funcionarios)
 
+async function testarSupabase(){
+
+const { data, error } = await supabase
+.from("funcionarios")
+.select("*")
+
+console.log("DADOS:", data)
+console.log("ERRO:", error)
+
+}
+
+testarSupabase()
+
 </script>
 
+
+
 </body>
+<script src="supabase.js"></script>
+
 </html>
