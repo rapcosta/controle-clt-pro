@@ -115,4 +115,20 @@ window.location="login.html"
 </script>
 
 </body>
+<script>
+
+async function protegerPagina(){
+
+const { data } = await supabaseClient.auth.getSession()
+
+if(!data.session){
+location="login.html"
+}
+
+}
+
+protegerPagina()
+
+</script>
+
 </html>

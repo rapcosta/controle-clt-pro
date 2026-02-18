@@ -112,6 +112,7 @@ location="dashboard.html"
 /* ========================= */
 /* AUTO LOGIN SE JÁ LOGADO */
 /* ========================= */
+
 async function verificarSessao(){
 
 const { data } = await supabaseClient.auth.getSession()
@@ -123,6 +124,7 @@ location="dashboard.html"
 }
 
 verificarSessao()
+
 
 </script>
 
