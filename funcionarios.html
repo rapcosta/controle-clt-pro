@@ -14,8 +14,27 @@
 /* ===== CONTAINER ===== */
 .container{
 max-width:1200px;
-margin:50px auto;
+margin:40px auto;
 text-align:center;
+}
+
+/* ===== BARRA SUPERIOR ===== */
+.top-bar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.top-bar input,
+.top-bar select{
+padding:8px 12px;
+border-radius:6px;
+border:none;
+background:#2a2a2a;
+color:white;
 }
 
 /* ===== TABELA ===== */
@@ -34,7 +53,6 @@ background:#2a2a2a;
 
 th{
 padding:14px;
-font-size:14px;
 }
 
 td{
@@ -73,7 +91,6 @@ button:hover{
 transform:scale(1.05);
 }
 
-/* VOLTAR */
 .voltar{
 margin-top:25px;
 padding:10px 20px;
@@ -82,7 +99,6 @@ color:white;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -90,6 +106,27 @@ color:white;
 <div class="container">
 
 <h1>Funcionários</h1>
+
+<!-- ===== FILTROS ===== -->
+<div class="top-bar">
+
+<input
+type="text"
+placeholder="Pesquisar funcionário..."
+id="pesquisa"
+oninput="aplicarFiltros()"
+>
+
+<select id="filtroUnidade" onchange="aplicarFiltros()">
+<option value="">Todas unidades</option>
+<option>Sabará</option>
+<option>Ocidental</option>
+<option>Águas Lindas</option>
+<option>Cruzeiro da Fortaleza</option>
+<option>Guimarânia</option>
+</select>
+
+</div>
 
 <table>
 <thead>
@@ -116,7 +153,11 @@ location="login.html"
 }
 
 let funcionarios = []
+let funcionariosFiltrados = []
 
+/* ============================= */
+/* CARREGAR */
+/* ============================= */
 async function carregarFuncionarios(){
 
 const { data, error } = await supabaseClient
@@ -131,17 +172,43 @@ return
 }
 
 funcionarios = data
+funcionariosFiltrados = data
 renderTabela()
 }
 
+/* ============================= */
+/* FILTROS */
+/* ============================= */
+function aplicarFiltros(){
+
+const termo = document.getElementById("pesquisa").value.toLowerCase()
+const unidade = document.getElementById("filtroUnidade").value
+
+funcionariosFiltrados = funcionarios.filter(f=>{
+
+const matchPesquisa =
+(f.nome||"").toLowerCase().includes(termo) ||
+(f.cpf||"").toLowerCase().includes(termo) ||
+(f.cargo||"").toLowerCase().includes(termo)
+
+const matchUnidade =
+!unidade || f.unidade === unidade
+
+return matchPesquisa && matchUnidade
+})
+
+renderTabela()
+}
+
+/* ============================= */
+/* TABELA */
+/* ============================= */
 function renderTabela(){
 
 const lista = document.getElementById("listaFuncionarios")
-if(!lista) return
-
 lista.innerHTML=""
 
-funcionarios.forEach((f,i)=>{
+funcionariosFiltrados.forEach((f,i)=>{
 
 lista.innerHTML += `
 <tr>
@@ -151,9 +218,9 @@ lista.innerHTML += `
 <td>${f.setor||""}</td>
 
 <td>
-<button class="btn-ver" onclick="ver(${i})">Ver</button>
-<button class="btn-editar" onclick="editar(${i})">Editar</button>
-<button class="btn-excluir" onclick="excluir(${i})">Excluir</button>
+<button class="btn-ver" onclick="ver('${f.id}')">Ver</button>
+<button class="btn-editar" onclick="editar('${f.id}')">Editar</button>
+<button class="btn-excluir" onclick="excluir('${f.id}')">Excluir</button>
 </td>
 </tr>
 `
@@ -161,23 +228,22 @@ lista.innerHTML += `
 
 }
 
-/* ===== AÇÕES ===== */
-
-function ver(i){
-localStorage.setItem("funcionarioSelecionado", funcionarios[i].id)
-window.location="ficha.html"
+/* ============================= */
+/* AÇÕES */
+/* ============================= */
+function ver(id){
+localStorage.setItem("funcionarioSelecionado", id)
+location="ficha.html"
 }
 
-function editar(i){
-localStorage.setItem("funcionarioEditando", funcionarios[i].id)
-window.location="ficha.html"
+function editar(id){
+localStorage.setItem("funcionarioEditando", id)
+location="ficha.html"
 }
 
-async function excluir(i){
+async function excluir(id){
 
 if(!confirm("Excluir funcionário?")) return
-
-const id = funcionarios[i].id
 
 const { error } = await supabaseClient
 .from("funcionarios")
@@ -186,13 +252,13 @@ const { error } = await supabaseClient
 
 if(error){
 alert("Erro ao excluir")
-console.error(error)
 return
 }
 
 carregarFuncionarios()
 }
 
+/* ============================= */
 carregarFuncionarios()
 
 </script>
