@@ -35,9 +35,7 @@ h2{ grid-column:span 2; margin-top:20px }
 
 <div class="container">
 
-<!-- ================= DADOS PESSOAIS ================= -->
 <h2>Dados Pessoais</h2>
-
 <input id="nome" placeholder="Nome completo" class="full">
 <input id="email" placeholder="Email">
 <input id="celular" placeholder="Celular">
@@ -45,17 +43,13 @@ h2{ grid-column:span 2; margin-top:20px }
 <input id="genero" placeholder="Gênero">
 <input id="sangue" placeholder="Tipo sanguíneo">
 
-<!-- ================= DOCUMENTOS ================= -->
 <h2>Documentos</h2>
-
 <input id="cpf" placeholder="CPF">
 <input id="rg" placeholder="RG">
 <input id="ctps" placeholder="CTPS">
 <input id="nis" placeholder="NIS">
 
-<!-- ================= PROFISSIONAL ================= -->
 <h2>Dados Profissionais</h2>
-
 <input id="funcao" placeholder="Função">
 <input id="cbo" placeholder="CBO">
 <input id="categoria" placeholder="Categoria código">
@@ -64,9 +58,7 @@ h2{ grid-column:span 2; margin-top:20px }
 <input id="horario" placeholder="Horário de trabalho">
 <input id="atividades" placeholder="Atividades" class="full">
 
-<!-- ================= EMPRESA ================= -->
 <h2>Empresa</h2>
-
 <input id="empresa" placeholder="Empresa">
 <input id="cnpj" placeholder="CNPJ">
 
@@ -79,9 +71,7 @@ h2{ grid-column:span 2; margin-top:20px }
 <option>Guimarania</option>
 </select>
 
-<!-- ================= DADOS BANCÁRIOS ================= -->
 <h2>Dados Bancários</h2>
-
 <input id="banco" placeholder="Banco">
 <input id="agencia" placeholder="Agência">
 <input id="conta" placeholder="Conta">
@@ -94,34 +84,30 @@ h2{ grid-column:span 2; margin-top:20px }
 
 <script>
 
-let uidEditar = null
+/* ================= LOGIN ================= */
 
-/* ================= PROTEGER PÁGINA ================= */
 async function verificarLogin(){
 const { data } = await supabaseClient.auth.getSession()
-
 if(!data.session){
-location = "login.html"
-return
-}
-
-uidEditar = localStorage.getItem("funcionarioEditando")
-
-if(uidEditar){
-titulo.innerText = "Editar Funcionário"
-carregar()
+location="login.html"
 }
 }
-
 verificarLogin()
 
-/* ================= LOGOUT ================= */
 async function logout(){
 await supabaseClient.auth.signOut()
-location = "login.html"
+location="login.html"
 }
 
-/* ================= CARREGAR ================= */
+/* ================= EDIÇÃO ================= */
+
+let uidEditar = localStorage.getItem("funcionarioEditando")
+
+if(uidEditar){
+document.getElementById("titulo").innerText="Editar Funcionário"
+carregar()
+}
+
 async function carregar(){
 
 const { data, error } = await supabaseClient
@@ -131,48 +117,67 @@ const { data, error } = await supabaseClient
 .single()
 
 if(error){
-alert("Erro ao carregar dados")
-console.error(error)
+alert("Erro ao carregar dados:\n"+error.message)
 return
 }
 
 Object.keys(data).forEach(campo=>{
-const el = document.getElementById(campo)
-if(el) el.value = data[campo]
+const el=document.getElementById(campo)
+if(el) el.value=data[campo]
 })
 }
 
+/* ================= MENSAGEM ERRO ================= */
+
+function mensagemErro(error){
+
+let msg = error.message || "Erro desconhecido"
+
+if(msg.includes("invalid input syntax for type date"))
+msg="Existe campo de DATA vazio ou inválido"
+
+if(msg.includes("null value in column"))
+msg="Existe campo obrigatório não preenchido"
+
+if(msg.includes("duplicate key"))
+msg="Registro duplicado no banco"
+
+return msg
+}
+
 /* ================= SALVAR ================= */
+
 async function salvar(){
 
-const funcionario = {
-nome:nome.value,
-email:email.value,
-celular:celular.value,
-nascimento:nascimento.value,
-genero:genero.value,
-sangue:sangue.value,
-cpf:cpf.value,
-rg:rg.value,
-ctps:ctps.value,
-nis:nis.value,
-funcao:funcao.value,
-cbo:cbo.value,
-categoria:categoria.value,
-matricula:matricula.value,
-entrada:entrada.value,
-horario:horario.value,
-atividades:atividades.value,
-empresa:empresa.value,
-cnpj:cnpj.value,
-unidade:unidade.value,
-banco:banco.value,
-agencia:agencia.value,
-conta:conta.value,
-pix:pix.value
+const funcionario={
+nome:document.getElementById("nome").value,
+email:document.getElementById("email").value,
+celular:document.getElementById("celular").value,
+nascimento:document.getElementById("nascimento").value,
+genero:document.getElementById("genero").value,
+sangue:document.getElementById("sangue").value,
+cpf:document.getElementById("cpf").value,
+rg:document.getElementById("rg").value,
+ctps:document.getElementById("ctps").value,
+nis:document.getElementById("nis").value,
+funcao:document.getElementById("funcao").value,
+cbo:document.getElementById("cbo").value,
+categoria:document.getElementById("categoria").value,
+matricula:document.getElementById("matricula").value,
+entrada:document.getElementById("entrada").value,
+horario:document.getElementById("horario").value,
+atividades:document.getElementById("atividades").value,
+empresa:document.getElementById("empresa").value,
+cnpj:document.getElementById("cnpj").value,
+unidade:document.getElementById("unidade").value,
+banco:document.getElementById("banco").value,
+agencia:document.getElementById("agencia").value,
+conta:document.getElementById("conta").value,
+pix:document.getElementById("pix").value
 }
 
 /* EDITAR */
+
 if(uidEditar){
 
 const { error } = await supabaseClient
@@ -181,7 +186,7 @@ const { error } = await supabaseClient
 .eq("uid", uidEditar)
 
 if(error){
-alert("Erro ao atualizar")
+alert("Erro ao atualizar:\n\n"+mensagemErro(error))
 console.error(error)
 return
 }
@@ -193,12 +198,13 @@ return
 }
 
 /* NOVO */
+
 const { error } = await supabaseClient
 .from("funcionarios")
 .insert([funcionario])
 
 if(error){
-alert("Erro ao cadastrar")
+alert("Erro ao cadastrar:\n\n"+mensagemErro(error))
 console.error(error)
 return
 }
@@ -207,20 +213,11 @@ alert("Funcionário cadastrado")
 location="funcionarios.html"
 }
 
-/* ================= VOLTAR ================= */
 function voltar(){
 localStorage.removeItem("funcionarioEditando")
 location="funcionarios.html"
 }
 
 </script>
-
-<script src="auth.js"></script>
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-protegerPagina()
-})
-</script>
-
 </body>
 </html>
