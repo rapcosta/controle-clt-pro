@@ -1,12 +1,12 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>Ficha do Funcionário</title>
 <link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
 body{
@@ -16,54 +16,16 @@ font-family:Arial;
 }
 
 .container{
-max-width:950px;
+max-width:900px;
 margin:40px auto;
 background:#1f1f1f;
 padding:25px;
 border-radius:8px;
 }
 
-.tabs{
-display:flex;
-gap:10px;
-margin-bottom:20px;
-border-bottom:1px solid #444;
-flex-wrap:wrap;
-}
-
-.tab{
-padding:10px 15px;
-cursor:pointer;
-background:#333;
-border-radius:6px 6px 0 0;
-}
-
-.tab.ativa{
-background:#2ecc71;
-color:black;
-}
-
-.conteudo{
-display:none;
-}
-
-.conteudo.ativo{
-display:block;
-}
-
-.linha{
-margin-bottom:12px;
-}
-
-.label{
-font-size:13px;
-color:#bbb;
-}
-
-.valor{
-font-size:16px;
-margin-top:2px;
-}
+.linha{ margin-bottom:12px }
+.label{ font-size:13px; color:#bbb }
+.valor{ font-size:16px }
 
 input{
 width:100%;
@@ -88,16 +50,6 @@ cursor:pointer;
 .btn-editar{ background:#3498db; color:white }
 .btn-salvar{ background:#2ecc71; color:black }
 .btn-voltar{ background:#555; color:white }
-
-.documento{
-background:#2a2a2a;
-padding:10px;
-margin-top:8px;
-border-radius:6px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
 </style>
 </head>
 
@@ -107,52 +59,29 @@ align-items:center;
 
 <h1 id="tituloNome"></h1>
 
-<div class="tabs">
-<div class="tab ativa" onclick="trocarAba(0)">Dados pessoais</div>
-<div class="tab" onclick="trocarAba(1)">Profissionais</div>
-<div class="tab" onclick="trocarAba(2)">Salariais</div>
-<div class="tab" onclick="trocarAba(3)">Banco</div>
-<div class="tab" onclick="trocarAba(4)">PIX</div>
-<div class="tab" onclick="trocarAba(5)">Documentos</div>
+<div class="linha">
+<div class="label">CPF</div>
+<div class="valor" id="cpf"></div>
 </div>
 
-<div class="conteudo ativo">
-<div class="linha"><div class="label">CPF</div><div class="valor" id="cpf"></div></div>
-<div class="linha"><div class="label">Nascimento</div><div class="valor" id="nascimento"></div></div>
-<div class="linha"><div class="label">Telefone</div><div class="valor" id="telefone"></div></div>
+<div class="linha">
+<div class="label">Cargo</div>
+<div class="valor" id="cargo"></div>
 </div>
 
-<div class="conteudo">
-<div class="linha"><div class="label">Cargo</div><div class="valor" id="cargo"></div></div>
-<div class="linha"><div class="label">Setor</div><div class="valor" id="setor"></div></div>
-<div class="linha"><div class="label">Admissão</div><div class="valor" id="admissao"></div></div>
-<div class="linha"><div class="label">Tipo contrato</div><div class="valor" id="contrato"></div></div>
+<div class="linha">
+<div class="label">Setor</div>
+<div class="valor" id="setor"></div>
 </div>
 
-<div class="conteudo">
-<div class="linha"><div class="label">Salário</div><div class="valor" id="salario"></div></div>
-</div>
-
-<div class="conteudo">
-<div class="linha"><div class="label">Banco</div><div class="valor" id="banco"></div></div>
-<div class="linha"><div class="label">Agência</div><div class="valor" id="agencia"></div></div>
-<div class="linha"><div class="label">Conta</div><div class="valor" id="conta"></div></div>
-</div>
-
-<div class="conteudo">
-<div class="linha"><div class="label">Tipo chave</div><div class="valor" id="pixTipo"></div></div>
-<div class="linha"><div class="label">Chave PIX</div><div class="valor" id="pixChave"></div></div>
-</div>
-
-<div class="conteudo">
-<input type="file" id="arquivo">
-<button onclick="anexar()">Anexar documento</button>
-<div id="listaDocs"></div>
+<div class="linha">
+<div class="label">Salário</div>
+<div class="valor" id="salario"></div>
 </div>
 
 <div class="botoes">
 <button class="btn-editar" onclick="editar()">Editar</button>
-<button class="btn-salvar" onclick="salvar()" style="display:none" id="btnSalvar">Salvar alterações</button>
+<button class="btn-salvar" onclick="salvar()" id="btnSalvar" style="display:none">Salvar</button>
 <button class="btn-voltar" onclick="voltar()">Voltar</button>
 </div>
 
@@ -160,146 +89,94 @@ align-items:center;
 
 <script>
 
-/* ========================= */
-/* PROTEÇÃO LOGIN */
-/* ========================= */
 if(localStorage.getItem("logado")!=="sim"){
-window.location="login.html"
+location="login.html"
 }
 
-/* ========================= */
-/* OBTER USUÁRIO LOGADO */
-/* ========================= */
-const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
+/* ID do funcionário */
+const id =
+localStorage.getItem("funcionarioEditando") ||
+localStorage.getItem("funcionarioSelecionado")
 
-/* ========================= */
-/* OBTER FUNCIONÁRIO */
-/* ========================= */
-const index = localStorage.getItem("funcionarioEditando") ?? localStorage.getItem("funcionarioSelecionado")
+let funcionarioAtual = null
 
-let funcionarios = JSON.parse(localStorage.getItem("funcionarios")) || []
-let f = funcionarios[index]
+/* ============================= */
+/* CARREGAR DO BANCO */
+/* ============================= */
+async function carregar(){
 
-/* ========================= */
-/* BLOQUEIO POR UNIDADE */
-/* ========================= */
+const { data, error } = await supabaseClient
+.from("funcionarios")
+.select("*")
+.eq("id", id)
+.single()
 
-if(!f){
-alert("Funcionário não encontrado")
-window.location="funcionarios.html"
+if(error){
+alert("Erro ao carregar funcionário")
+console.log(error)
+location="funcionarios.html"
+return
 }
 
-if(usuarioLogado.nome !== "admin" && f.unidade !== usuarioLogado.unidade){
-alert("Acesso negado: funcionário de outra unidade")
-window.location="funcionarios.html"
+funcionarioAtual = data
+mostrar()
 }
 
-/* ========================= */
-/* CARREGAR DADOS */
-/* ========================= */
+function mostrar(){
 
-document.getElementById("tituloNome").innerText = f.nome
-
-for(let campo in f){
-if(document.getElementById(campo)){
-document.getElementById(campo).innerText = f[campo] || "-"
-}
+tituloNome.innerText = funcionarioAtual.nome || ""
+cpf.innerText = funcionarioAtual.cpf || "-"
+cargo.innerText = funcionarioAtual.cargo || "-"
+setor.innerText = funcionarioAtual.setor || "-"
+salario.innerText = "R$ " + Number(funcionarioAtual.salario||0).toFixed(2)
 }
 
-document.getElementById("salario").innerText =
-"R$ " + Number(f.salario || 0).toFixed(2)
-
-/* ========================= */
-/* ABAS */
-/* ========================= */
-
-function trocarAba(i){
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("ativa"))
-document.querySelectorAll(".conteudo").forEach(c=>c.classList.remove("ativo"))
-document.querySelectorAll(".tab")[i].classList.add("ativa")
-document.querySelectorAll(".conteudo")[i].classList.add("ativo")
-}
-
-/* ========================= */
+/* ============================= */
 /* EDITAR */
-/* ========================= */
-
+/* ============================= */
 function editar(){
+
 document.querySelectorAll(".valor").forEach(el=>{
 const campo = el.id
 const valor = el.innerText.replace("R$ ","")
 el.innerHTML = `<input id="edit_${campo}" value="${valor}">`
 })
+
 btnSalvar.style.display="inline-block"
 }
 
-/* ========================= */
+/* ============================= */
 /* SALVAR */
-/* ========================= */
+/* ============================= */
+async function salvar(){
 
-function salvar(){
+const atualizacao = {}
+
 document.querySelectorAll("[id^='edit_']").forEach(input=>{
 const campo = input.id.replace("edit_","")
-f[campo] = input.value
+atualizacao[campo] = input.value
 })
-funcionarios[index] = f
-localStorage.setItem("funcionarios", JSON.stringify(funcionarios))
+
+const { error } = await supabaseClient
+.from("funcionarios")
+.update(atualizacao)
+.eq("id", id)
+
+if(error){
+alert("Erro ao salvar")
+console.log(error)
+return
+}
+
 alert("Alterações salvas")
 location.reload()
 }
 
-/* ========================= */
-/* DOCUMENTOS */
-/* ========================= */
-
-function listarDocs(){
-listaDocs.innerHTML=""
-if(!f.documentos) return
-f.documentos.forEach((doc,i)=>{
-listaDocs.innerHTML += `
-<div class="documento">
-<span>${doc.nome}</span>
-<div>
-<button onclick="baixar(${i})">Baixar</button>
-<button onclick="removerDoc(${i})">Remover</button>
-</div>
-</div>`
-})
-}
-listarDocs()
-
-function anexar(){
-const file = arquivo.files[0]
-if(!file) return alert("Selecione arquivo")
-const reader = new FileReader()
-reader.onload = e =>{
-if(!f.documentos) f.documentos=[]
-f.documentos.push({ nome:file.name, arquivo:e.target.result })
-localStorage.setItem("funcionarios", JSON.stringify(funcionarios))
-listarDocs()
-}
-reader.readAsDataURL(file)
-}
-
-function baixar(i){
-const doc=f.documentos[i]
-const a=document.createElement("a")
-a.href=doc.arquivo
-a.download=doc.nome
-a.click()
-}
-
-function removerDoc(i){
-if(confirm("Remover documento?")){
-f.documentos.splice(i,1)
-localStorage.setItem("funcionarios", JSON.stringify(funcionarios))
-listarDocs()
-}
-}
-
 function voltar(){
-window.location="funcionarios.html"
+location="funcionarios.html"
 }
+
+carregar()
 
 </script>
 
