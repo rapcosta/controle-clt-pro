@@ -6,7 +6,6 @@
 
 <link rel="stylesheet" href="style.css">
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
@@ -19,11 +18,6 @@ margin:50px auto;
 text-align:center;
 }
 
-/* ===== TÍTULO ===== */
-h1{
-margin-bottom:25px;
-}
-
 /* ===== TABELA ===== */
 table{
 width:100%;
@@ -34,7 +28,6 @@ overflow:hidden;
 box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
 
-/* CABEÇALHO */
 thead{
 background:#2a2a2a;
 }
@@ -42,64 +35,50 @@ background:#2a2a2a;
 th{
 padding:14px;
 font-size:14px;
-letter-spacing:0.5px;
 }
 
-/* CÉLULAS */
 td{
 padding:12px;
 border-top:1px solid #333;
 }
 
-/* NÃO QUEBRAR LINHA */
 th, td{
 white-space:nowrap;
 }
 
-/* LARGURAS DAS COLUNAS */
 td:nth-child(1){ min-width:260px; text-align:left; }
 td:nth-child(2){ min-width:160px; }
 td:nth-child(3){ min-width:180px; }
 td:nth-child(4){ min-width:180px; }
-td:nth-child(5){ min-width:120px; }
 
-/* HOVER LINHA */
 tbody tr:hover{
 background:#2f2f2f;
-transition:0.2s;
 }
 
 /* BOTÕES */
 button{
-background:#3a3a3a;
-color:white;
 border:none;
-padding:8px 14px;
+padding:7px 12px;
 border-radius:6px;
 cursor:pointer;
+margin:2px;
 font-size:13px;
-transition:0.2s;
 }
 
+.btn-ver{ background:#2f5f8a; color:white; }
+.btn-editar{ background:#3a7a3a; color:white; }
+.btn-excluir{ background:#7a2f2f; color:white; }
+
 button:hover{
-background:#555;
 transform:scale(1.05);
 }
 
-/* BOTÃO EXCLUIR */
-.btn-excluir{
-background:#7a2f2f;
-}
-
-.btn-excluir:hover{
-background:#a94444;
-}
-
-/* BOTÃO VOLTAR */
+/* VOLTAR */
 .voltar{
 margin-top:25px;
 padding:10px 20px;
 background:#444;
+color:white;
 }
 
 </style>
@@ -132,14 +111,12 @@ background:#444;
 
 <script>
 
-/* PROTEÇÃO LOGIN */
 if(localStorage.getItem("logado")!=="sim"){
 location="login.html"
 }
 
 let funcionarios = []
 
-/* CARREGAR FUNCIONÁRIOS */
 async function carregarFuncionarios(){
 
 const { data, error } = await supabaseClient
@@ -157,7 +134,6 @@ funcionarios = data
 renderTabela()
 }
 
-/* RENDERIZAR TABELA */
 function renderTabela(){
 
 const lista = document.getElementById("listaFuncionarios")
@@ -173,7 +149,10 @@ lista.innerHTML += `
 <td>${f.cpf||""}</td>
 <td>${f.cargo||""}</td>
 <td>${f.setor||""}</td>
+
 <td>
+<button class="btn-ver" onclick="ver(${i})">Ver</button>
+<button class="btn-editar" onclick="editar(${i})">Editar</button>
 <button class="btn-excluir" onclick="excluir(${i})">Excluir</button>
 </td>
 </tr>
@@ -182,7 +161,18 @@ lista.innerHTML += `
 
 }
 
-/* EXCLUIR */
+/* ===== AÇÕES ===== */
+
+function ver(i){
+localStorage.setItem("funcionarioSelecionado", funcionarios[i].id)
+window.location="ficha.html"
+}
+
+function editar(i){
+localStorage.setItem("funcionarioEditando", funcionarios[i].id)
+window.location="ficha.html"
+}
+
 async function excluir(i){
 
 if(!confirm("Excluir funcionário?")) return
@@ -203,7 +193,6 @@ return
 carregarFuncionarios()
 }
 
-/* INICIAR */
 carregarFuncionarios()
 
 </script>
