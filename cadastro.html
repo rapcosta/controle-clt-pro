@@ -11,7 +11,7 @@
 
 <style>
 .container{
-max-width:900px;
+max-width:1000px;
 margin:auto;
 display:grid;
 grid-template-columns:repeat(2,1fr);
@@ -23,6 +23,7 @@ border-radius:6px;
 border:none;
 }
 .full{ grid-column:span 2 }
+h2{ grid-column:span 2; margin-top:20px }
 </style>
 </head>
 
@@ -32,6 +33,9 @@ border:none;
 
 <div class="container">
 
+<!-- ================= DADOS PESSOAIS ================= -->
+<h2>Dados Pessoais</h2>
+
 <input id="nome" placeholder="Nome completo" class="full">
 <input id="email" placeholder="Email">
 <input id="celular" placeholder="Celular">
@@ -39,35 +43,59 @@ border:none;
 <input id="genero" placeholder="Gênero">
 <input id="sangue" placeholder="Tipo sanguíneo">
 
+<!-- ================= DOCUMENTOS ================= -->
+<h2>Documentos</h2>
+
 <input id="cpf" placeholder="CPF">
 <input id="rg" placeholder="RG">
 <input id="ctps" placeholder="CTPS">
 <input id="nis" placeholder="NIS">
+
+<!-- ================= PROFISSIONAL ================= -->
+<h2>Dados Profissionais</h2>
 
 <input id="funcao" placeholder="Função">
 <input id="cbo" placeholder="CBO">
 <input id="categoria" placeholder="Categoria código">
 <input id="matricula" placeholder="Matrícula">
 <input id="entrada" type="date">
-<input id="atividades" placeholder="Atividades" class="full">
 <input id="horario" placeholder="Horário de trabalho">
+<input id="atividades" placeholder="Atividades" class="full">
+
+<!-- ================= EMPRESA ================= -->
+<h2>Empresa</h2>
 
 <input id="empresa" placeholder="Empresa">
 <input id="cnpj" placeholder="CNPJ">
 
 <select id="unidade" class="full">
 <option value="">Selecionar unidade</option>
-<option>Sabará</option>
-<option>Águas Lindas</option>
-<option>Valparaíso</option>
+<option>Sabara</option>
+<option>Cruzeiro da Fortaleza</option>
+<option>Ocidental</option>
+<option>Aguas Lindas</option>
+<option>Guimarania</option>
 </select>
 
+<!-- ================= DADOS BANCÁRIOS ================= -->
+<h2>Dados Bancários</h2>
+
+<input id="banco" placeholder="Banco">
+<input id="agencia" placeholder="Agência">
+<input id="conta" placeholder="Conta">
+<input id="pix" placeholder="Chave PIX" class="full">
+
+<!-- ================= BOTÕES ================= -->
 <button onclick="salvar()">Salvar</button>
 <button onclick="voltar()">Cancelar</button>
 
 </div>
 
 <script>
+
+if(localStorage.getItem("logado")!=="sim"){
+location="login.html"
+}
 
 const uidEditar = localStorage.getItem("funcionarioEditando")
 
@@ -76,22 +104,28 @@ titulo.innerText="Editar Funcionário"
 carregar()
 }
 
+/* ================= CARREGAR PARA EDIÇÃO ================= */
 async function carregar(){
 
-const { data } = await supabaseClient
+const { data, error } = await supabaseClient
 .from("funcionarios")
 .select("*")
-.eq("uid",uidEditar)
+.eq("uid", uidEditar)
 .single()
 
-if(!data) return
+if(error){
+alert("Erro ao carregar dados")
+console.error(error)
+return
+}
 
-Object.keys(data).forEach(k=>{
-const el=document.getElementById(k)
-if(el) el.value=data[k]
+Object.keys(data).forEach(campo=>{
+const el=document.getElementById(campo)
+if(el) el.value=data[campo]
 })
 }
 
+/* ================= SALVAR ================= */
 async function salvar(){
 
 const funcionario={
@@ -110,35 +144,55 @@ cbo:cbo.value,
 categoria:categoria.value,
 matricula:matricula.value,
 entrada:entrada.value,
-atividades:atividades.value,
 horario:horario.value,
+atividades:atividades.value,
 empresa:empresa.value,
 cnpj:cnpj.value,
-unidade:unidade.value
+unidade:unidade.value,
+banco:banco.value,
+agencia:agencia.value,
+conta:conta.value,
+pix:pix.value
 }
 
+/* EDITAR */
 if(uidEditar){
 
-await supabaseClient
+const { error } = await supabaseClient
 .from("funcionarios")
 .update(funcionario)
-.eq("uid",uidEditar)
+.eq("uid", uidEditar)
+
+if(error){
+alert("Erro ao atualizar")
+console.error(error)
+return
+}
 
 localStorage.removeItem("funcionarioEditando")
-alert("Atualizado")
+alert("Funcionário atualizado")
 location="funcionarios.html"
 return
 }
 
-await supabaseClient
+/* NOVO */
+
+const { error } = await supabaseClient
 .from("funcionarios")
 .insert([funcionario])
 
-alert("Cadastrado")
+if(error){
+alert("Erro ao cadastrar")
+console.error(error)
+return
+}
+
+alert("Funcionário cadastrado")
 location="funcionarios.html"
 }
 
 function voltar(){
+localStorage.removeItem("funcionarioEditando")
 location="funcionarios.html"
 }
 
