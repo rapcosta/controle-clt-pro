@@ -1,134 +1,48 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<title>Ficha do Funcionário</title>
-<link rel="stylesheet" href="style.css">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
-<style>
-body{
-background:#111;
-color:white;
-font-family:Arial;
-}
-
-.container{
-max-width:900px;
-margin:40px auto;
-background:#1f1f1f;
-padding:25px;
-border-radius:8px;
-}
-
-.linha{ margin-bottom:12px }
-.label{ font-size:13px; color:#bbb }
-.valor{ font-size:16px }
-
-input{
-width:100%;
-padding:7px;
-border-radius:4px;
-border:none;
-}
-
-.botoes{
-margin-top:25px;
-display:flex;
-gap:10px;
-}
-
-button{
-padding:10px 18px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
-
-.btn-editar{ background:#3498db; color:white }
-.btn-salvar{ background:#2ecc71; color:black }
-.btn-voltar{ background:#555; color:white }
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h1 id="tituloNome"></h1>
-
-<div class="linha">
-<div class="label">CPF</div>
-<div class="valor" id="cpf"></div>
-</div>
-
-<div class="linha">
-<div class="label">Cargo</div>
-<div class="valor" id="cargo"></div>
-</div>
-
-<div class="linha">
-<div class="label">Setor</div>
-<div class="valor" id="setor"></div>
-</div>
-
-<div class="linha">
-<div class="label">Salário</div>
-<div class="valor" id="salario"></div>
-</div>
-
-<div class="botoes">
-<button class="btn-editar" onclick="editar()">Editar</button>
-<button class="btn-salvar" onclick="salvar()" id="btnSalvar" style="display:none">Salvar</button>
-<button class="btn-voltar" onclick="voltar()">Voltar</button>
-</div>
-
-</div>
-
 <script>
 
 if(localStorage.getItem("logado")!=="sim"){
 location="login.html"
 }
 
-/* ID do funcionário */
+/* pegar id correto */
 const id =
 localStorage.getItem("funcionarioEditando") ||
 localStorage.getItem("funcionarioSelecionado")
 
-let funcionarioAtual = null
+if(!id){
+alert("Funcionário não encontrado")
+location="funcionarios.html"
+}
 
 /* ============================= */
-/* CARREGAR DO BANCO */
+/* CARREGAR FUNCIONÁRIO */
 /* ============================= */
 async function carregar(){
 
 const { data, error } = await supabaseClient
 .from("funcionarios")
 .select("*")
-.eq("id", id)
+.eq("uid", id)   // ← AQUI É O MAIS IMPORTANTE
 .single()
 
 if(error){
 alert("Erro ao carregar funcionário")
-console.log(error)
+console.error(error)
 location="funcionarios.html"
 return
 }
 
-funcionarioAtual = data
-mostrar()
+mostrar(data)
 }
 
-function mostrar(){
+function mostrar(f){
 
-tituloNome.innerText = funcionarioAtual.nome || ""
-cpf.innerText = funcionarioAtual.cpf || "-"
-cargo.innerText = funcionarioAtual.cargo || "-"
-setor.innerText = funcionarioAtual.setor || "-"
-salario.innerText = "R$ " + Number(funcionarioAtual.salario||0).toFixed(2)
+tituloNome.innerText = f.nome || ""
+cpf.innerText = f.cpf || "-"
+cargo.innerText = f.cargo || "-"
+setor.innerText = f.setor || "-"
+salario.innerText = "R$ " + Number(f.salario||0).toFixed(2)
+
 }
 
 /* ============================= */
@@ -160,11 +74,11 @@ atualizacao[campo] = input.value
 const { error } = await supabaseClient
 .from("funcionarios")
 .update(atualizacao)
-.eq("id", id)
+.eq("uid", id)   // ← IMPORTANTE
 
 if(error){
 alert("Erro ao salvar")
-console.log(error)
+console.error(error)
 return
 }
 
@@ -179,6 +93,3 @@ location="funcionarios.html"
 carregar()
 
 </script>
-
-</body>
-</html>
