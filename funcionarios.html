@@ -3,11 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <title>Funcionários - Controle CLT Pro</title>
+
 <link rel="stylesheet" href="style.css">
 
 <!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+
+<style>
+
+/* ===== CONTAINER ===== */
+.container{
+max-width:1200px;
+margin:50px auto;
+text-align:center;
+}
+
+/* ===== TÍTULO ===== */
+h1{
+margin-bottom:25px;
+}
+
+/* ===== TABELA ===== */
+table{
+width:100%;
+border-collapse:collapse;
+background:#1c1c1c;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 0 20px rgba(0,0,0,0.4);
+}
+
+/* CABEÇALHO */
+thead{
+background:#2a2a2a;
+}
+
+th{
+padding:14px;
+font-size:14px;
+letter-spacing:0.5px;
+}
+
+/* CÉLULAS */
+td{
+padding:12px;
+border-top:1px solid #333;
+}
+
+/* NÃO QUEBRAR LINHA */
+th, td{
+white-space:nowrap;
+}
+
+/* LARGURAS DAS COLUNAS */
+td:nth-child(1){ min-width:260px; text-align:left; }
+td:nth-child(2){ min-width:160px; }
+td:nth-child(3){ min-width:180px; }
+td:nth-child(4){ min-width:180px; }
+td:nth-child(5){ min-width:120px; }
+
+/* HOVER LINHA */
+tbody tr:hover{
+background:#2f2f2f;
+transition:0.2s;
+}
+
+/* BOTÕES */
+button{
+background:#3a3a3a;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+cursor:pointer;
+font-size:13px;
+transition:0.2s;
+}
+
+button:hover{
+background:#555;
+transform:scale(1.05);
+}
+
+/* BOTÃO EXCLUIR */
+.btn-excluir{
+background:#7a2f2f;
+}
+
+.btn-excluir:hover{
+background:#a94444;
+}
+
+/* BOTÃO VOLTAR */
+.voltar{
+margin-top:25px;
+padding:10px 20px;
+background:#444;
+}
+
+</style>
 
 </head>
 
@@ -17,7 +112,7 @@
 
 <h1>Funcionários</h1>
 
-<table border="1" width="100%">
+<table>
 <thead>
 <tr>
 <th>Nome</th>
@@ -31,25 +126,20 @@
 <tbody id="listaFuncionarios"></tbody>
 </table>
 
-<br>
-<button onclick="window.location='dashboard.html'">Voltar</button>
+<button class="voltar" onclick="window.location='dashboard.html'">Voltar</button>
 
 </div>
 
 <script>
 
-/* ========================= */
 /* PROTEÇÃO LOGIN */
-/* ========================= */
 if(localStorage.getItem("logado")!=="sim"){
 location="login.html"
 }
 
 let funcionarios = []
 
-/* ============================= */
-/* CARREGAR FUNCIONÁRIOS DO BANCO */
-/* ============================= */
+/* CARREGAR FUNCIONÁRIOS */
 async function carregarFuncionarios(){
 
 const { data, error } = await supabaseClient
@@ -67,17 +157,11 @@ funcionarios = data
 renderTabela()
 }
 
-/* ============================= */
 /* RENDERIZAR TABELA */
-/* ============================= */
 function renderTabela(){
 
 const lista = document.getElementById("listaFuncionarios")
-
-if(!lista){
-console.error("Elemento listaFuncionarios não existe")
-return
-}
+if(!lista) return
 
 lista.innerHTML=""
 
@@ -89,9 +173,8 @@ lista.innerHTML += `
 <td>${f.cpf||""}</td>
 <td>${f.cargo||""}</td>
 <td>${f.setor||""}</td>
-
 <td>
-<button onclick="excluir(${i})">Excluir</button>
+<button class="btn-excluir" onclick="excluir(${i})">Excluir</button>
 </td>
 </tr>
 `
@@ -99,9 +182,7 @@ lista.innerHTML += `
 
 }
 
-/* ============================= */
-/* EXCLUIR FUNCIONÁRIO */
-/* ============================= */
+/* EXCLUIR */
 async function excluir(i){
 
 if(!confirm("Excluir funcionário?")) return
@@ -119,13 +200,10 @@ console.error(error)
 return
 }
 
-alert("Funcionário excluído")
 carregarFuncionarios()
 }
 
-/* ============================= */
 /* INICIAR */
-/* ============================= */
 carregarFuncionarios()
 
 </script>
