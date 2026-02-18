@@ -1,3 +1,12 @@
+<button onclick="logout()">Sair</button>
+
+<script>
+async function logout(){
+await supabaseClient.auth.signOut()
+location="login.html"
+}
+</script>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -38,6 +47,18 @@
 <button onclick="voltar()">Voltar</button>
 
 <script>
+    async function verificarLogin(){
+
+const { data } = await supabaseClient.auth.getSession()
+
+if(!data.session){
+location="login.html"
+}
+
+}
+
+verificarLogin()
+
 
 if(localStorage.getItem("logado")!=="sim"){
 location="login.html"
