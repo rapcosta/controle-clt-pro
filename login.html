@@ -2,30 +2,72 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Login - Controle CLT Pro</title>
-<link rel="stylesheet" href="style.css">
+<title>Login</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<style>
+body{
+background:#111;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-family:Arial;
+}
+.box{
+background:#1f1f1f;
+padding:30px;
+border-radius:10px;
+width:300px;
+}
+input{
+width:100%;
+margin-bottom:10px;
+padding:8px;
+border-radius:6px;
+border:none;
+}
+button{
+width:100%;
+padding:10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+</style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="box">
+<h2>Login</h2>
 
-<h2>Login do Sistema</h2>
+<input id="email" placeholder="Email">
+<input id="senha" type="password" placeholder="Senha">
 
-<form onsubmit="login(event)">
-
-<input id="usuario" placeholder="Usuário" required>
-<input id="senha" type="password" placeholder="Senha" required>
-
-<button type="submit">Entrar</button>
-
-</form>
-
-<p id="erro" style="color:red"></p>
-
+<button onclick="login()">Entrar</button>
 </div>
 
-<script src="login.js"></script>
+<script>
 
+async function login(){
+
+const { error } = await supabaseClient.auth.signInWithPassword({
+email: email.value,
+password: senha.value
+})
+
+if(error){
+alert("Email ou senha inválidos")
+return
+}
+
+location="dashboard.html"
+}
+
+</script>
 </body>
 </html>
