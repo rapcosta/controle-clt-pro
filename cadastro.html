@@ -1,12 +1,3 @@
-<button onclick="logout()">Sair</button>
-
-<script>
-async function logout(){
-await supabaseClient.auth.signOut()
-location="login.html"
-}
-</script>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -37,6 +28,8 @@ h2{ grid-column:span 2; margin-top:20px }
 </head>
 
 <body>
+
+<button onclick="logout()">Sair</button>
 
 <h1 id="titulo">Cadastro de Funcionário</h1>
 
@@ -94,37 +87,41 @@ h2{ grid-column:span 2; margin-top:20px }
 <input id="conta" placeholder="Conta">
 <input id="pix" placeholder="Chave PIX" class="full">
 
-<!-- ================= BOTÕES ================= -->
 <button onclick="salvar()">Salvar</button>
 <button onclick="voltar()">Cancelar</button>
 
 </div>
 
 <script>
-async function verificarLogin(){
 
+let uidEditar = null
+
+/* ================= PROTEGER PÁGINA ================= */
+async function verificarLogin(){
 const { data } = await supabaseClient.auth.getSession()
 
 if(!data.session){
-location="login.html"
+location = "login.html"
+return
 }
 
+uidEditar = localStorage.getItem("funcionarioEditando")
+
+if(uidEditar){
+titulo.innerText = "Editar Funcionário"
+carregar()
+}
 }
 
 verificarLogin()
 
-if(localStorage.getItem("logado")!=="sim"){
-location="login.html"
+/* ================= LOGOUT ================= */
+async function logout(){
+await supabaseClient.auth.signOut()
+location = "login.html"
 }
 
-const uidEditar = localStorage.getItem("funcionarioEditando")
-
-if(uidEditar){
-titulo.innerText="Editar Funcionário"
-carregar()
-}
-
-/* ================= CARREGAR PARA EDIÇÃO ================= */
+/* ================= CARREGAR ================= */
 async function carregar(){
 
 const { data, error } = await supabaseClient
@@ -140,15 +137,15 @@ return
 }
 
 Object.keys(data).forEach(campo=>{
-const el=document.getElementById(campo)
-if(el) el.value=data[campo]
+const el = document.getElementById(campo)
+if(el) el.value = data[campo]
 })
 }
 
 /* ================= SALVAR ================= */
 async function salvar(){
 
-const funcionario={
+const funcionario = {
 nome:nome.value,
 email:email.value,
 celular:celular.value,
@@ -196,7 +193,6 @@ return
 }
 
 /* NOVO */
-
 const { error } = await supabaseClient
 .from("funcionarios")
 .insert([funcionario])
@@ -211,6 +207,7 @@ alert("Funcionário cadastrado")
 location="funcionarios.html"
 }
 
+/* ================= VOLTAR ================= */
 function voltar(){
 localStorage.removeItem("funcionarioEditando")
 location="funcionarios.html"

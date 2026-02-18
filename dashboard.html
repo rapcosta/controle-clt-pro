@@ -29,39 +29,13 @@
 
 </div>
 
+<!-- proteção da página -->
+<script src="auth.js"></script>
 <script>
-
-/* ============================= */
-/* PROTEGER PÁGINA + MOSTRAR USUÁRIO */
-/* ============================= */
-
-supabaseClient.auth.onAuthStateChange((event, session)=>{
-
-console.log("Auth event:", event)
-
-if(event === "SIGNED_OUT"){
-window.location.href = "login.html"
-return
-}
-
-if(event === "SIGNED_IN" || event === "INITIAL_SESSION"){
-if(session){
-const el = document.getElementById("usuarioLogado")
-if(el){
-el.innerText = "Logado como: " + session.user.email
-}
-}
-}
-
+window.addEventListener("DOMContentLoaded", () => {
+protegerPagina()
 })
-
-/* ============================= */
-/* LOGOUT */
-/* ============================= */
-
-async function logout(){
-await supabaseClient.auth.signOut()
-}
+</script>
 
 </script>
 

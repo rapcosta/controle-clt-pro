@@ -1,12 +1,3 @@
-<button onclick="logout()">Sair</button>
-
-<script>
-async function logout(){
-await supabaseClient.auth.signOut()
-location="login.html"
-}
-</script>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -26,9 +17,11 @@ location="login.html"
 
 <select id="filtroUnidade" onchange="filtrar()">
 <option value="">Todas unidades</option>
-<option value="Sabará">Sabará</option>
-<option value="Águas Lindas">Águas Lindas</option>
-<option value="Valparaíso">Valparaíso</option>
+<option value="Sabara">Sabara</option>
+<option value="Cruzeiro da Fortaleza">Cruzeiro da Fortaleza</option>
+<option value="Ocidental">Ocidental</option>
+<option value="Aguas Lindas">Aguas Lindas</option>
+<option value="Guimarania">Guimarania</option>
 </select>
 
 <table>
@@ -41,28 +34,17 @@ location="login.html"
 <th>Ações</th>
 </tr>
 </thead>
+
 <tbody id="lista"></tbody>
 </table>
 
 <button onclick="voltar()">Voltar</button>
 
 <script>
-    async function verificarLogin(){
 
-const { data } = await supabaseClient.auth.getSession()
-
-if(!data.session){
-location="login.html"
-}
-
-}
-
-verificarLogin()
-
-
-if(localStorage.getItem("logado")!=="sim"){
-location="login.html"
-}
+/* ========================= */
+/* CARREGAR FUNCIONÁRIOS */
+/* ========================= */
 
 let funcionarios=[]
 
@@ -79,9 +61,13 @@ console.error(error)
 return
 }
 
-funcionarios=data
-renderTabela(data)
+funcionarios = data || []
+renderTabela(funcionarios)
 }
+
+/* ========================= */
+/* RENDERIZAR TABELA */
+/* ========================= */
 
 function renderTabela(lista){
 
@@ -90,12 +76,12 @@ tbody.innerHTML=""
 
 lista.forEach(f=>{
 
-tbody.innerHTML+=`
+tbody.innerHTML += `
 <tr>
-<td>${f.nome||""}</td>
-<td>${f.cpf||""}</td>
-<td>${f.cargo||""}</td>
-<td>${f.setor||""}</td>
+<td>${f.nome || ""}</td>
+<td>${f.cpf || ""}</td>
+<td>${f.cargo || ""}</td>
+<td>${f.setor || ""}</td>
 <td>
 <button onclick="ver('${f.uid}')">Ver</button>
 <button onclick="editar('${f.uid}')">Editar</button>
@@ -106,21 +92,29 @@ tbody.innerHTML+=`
 })
 }
 
+/* ========================= */
+/* FILTRAR */
+/* ========================= */
+
 function filtrar(){
 
 const termo=document.getElementById("pesquisa").value.toLowerCase()
 const unidade=document.getElementById("filtroUnidade").value
 
-const filtrados=funcionarios.filter(f=>{
+const filtrados = funcionarios.filter(f=>{
 
-const nomeMatch=(f.nome||"").toLowerCase().includes(termo)
-const unidadeMatch=!unidade || f.unidade===unidade
+const nomeMatch = (f.nome || "").toLowerCase().includes(termo)
+const unidadeMatch = !unidade || (f.unidade || "") === unidade
 
 return nomeMatch && unidadeMatch
 })
 
 renderTabela(filtrados)
 }
+
+/* ========================= */
+/* AÇÕES */
+/* ========================= */
 
 function ver(uid){
 localStorage.setItem("funcionarioUID",uid)
@@ -155,8 +149,22 @@ function voltar(){
 location="dashboard.html"
 }
 
+/* ========================= */
+/* INICIAR */
+/* ========================= */
+
 carregarFuncionarios()
 
 </script>
+
+<!-- PROTEÇÃO LOGIN -->
+<script src="auth.js"></script>
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+protegerPagina()
+})
+</script>
+
+
 </body>
 </html>

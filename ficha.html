@@ -1,12 +1,3 @@
-<button onclick="logout()">Sair</button>
-
-<script>
-async function logout(){
-await supabaseClient.auth.signOut()
-location="login.html"
-}
-</script>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -20,6 +11,8 @@ location="login.html"
 
 <body>
 
+<button onclick="logout()">Sair</button>
+
 <h2 id="nome"></h2>
 
 <p>CPF: <span id="cpf"></span></p>
@@ -31,31 +24,22 @@ location="login.html"
 <button onclick="voltar()">Voltar</button>
 
 <script>
-async function verificarLogin(){
 
-const { data } = await supabaseClient.auth.getSession()
-
-if(!data.session){
-location="login.html"
-}
-
-}
-
-verificarLogin()
-
-const uid=localStorage.getItem("funcionarioUID")
+/* ================= UID ================= */
+const uid = localStorage.getItem("funcionarioUID")
 
 if(!uid){
 alert("Funcionário não encontrado")
 location="funcionarios.html"
 }
 
+/* ================= CARREGAR ================= */
 async function carregar(){
 
 const { data, error } = await supabaseClient
 .from("funcionarios")
 .select("*")
-.eq("uid",uid)
+.eq("uid", uid)
 .single()
 
 if(error){
@@ -64,15 +48,17 @@ console.error(error)
 return
 }
 
-document.getElementById("nome").innerText=data.nome||""
-document.getElementById("cpf").innerText=data.cpf||""
-document.getElementById("cargo").innerText=data.cargo||""
-document.getElementById("setor").innerText=data.setor||""
-document.getElementById("salario").innerText=data.salario||""
+document.getElementById("nome").innerText = data.nome || ""
+document.getElementById("cpf").innerText = data.cpf || ""
+document.getElementById("cargo").innerText = data.cargo || ""
+document.getElementById("setor").innerText = data.setor || ""
+document.getElementById("salario").innerText = data.salario || ""
 }
 
+/* ================= AÇÕES ================= */
+
 function editar(){
-localStorage.setItem("funcionarioEditando",uid)
+localStorage.setItem("funcionarioEditando", uid)
 location="cadastro.html"
 }
 
@@ -80,8 +66,25 @@ function voltar(){
 location="funcionarios.html"
 }
 
+async function logout(){
+await supabaseClient.auth.signOut()
+location="login.html"
+}
+
+/* ================= INICIAR ================= */
+
 carregar()
 
 </script>
+
+<!-- proteção login -->
+<script src="auth.js"></script>
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+protegerPagina()
+})
+</script>
+
+
 </body>
 </html>
