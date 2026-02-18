@@ -8,22 +8,59 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+
+<style>
+.container{
+max-width:900px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+input,select{
+padding:8px;
+border-radius:6px;
+border:none;
+}
+.full{ grid-column:span 2 }
+</style>
 </head>
 
 <body>
 
-<h1 id="titulo">Cadastrar Funcionário</h1>
+<h1 id="titulo">Cadastro de Funcionário</h1>
 
 <div class="container">
 
-<input id="nome" placeholder="Nome completo">
-<input id="cpf" placeholder="CPF">
-<input id="cargo" placeholder="Cargo">
-<input id="setor" placeholder="Setor">
-<input id="salario" placeholder="Salário">
-<input id="unidade" placeholder="Unidade (Sabará, Águas Lindas...)">
+<input id="nome" placeholder="Nome completo" class="full">
+<input id="email" placeholder="Email">
+<input id="celular" placeholder="Celular">
+<input id="nascimento" type="date">
+<input id="genero" placeholder="Gênero">
+<input id="sangue" placeholder="Tipo sanguíneo">
 
-<br><br>
+<input id="cpf" placeholder="CPF">
+<input id="rg" placeholder="RG">
+<input id="ctps" placeholder="CTPS">
+<input id="nis" placeholder="NIS">
+
+<input id="funcao" placeholder="Função">
+<input id="cbo" placeholder="CBO">
+<input id="categoria" placeholder="Categoria código">
+<input id="matricula" placeholder="Matrícula">
+<input id="entrada" type="date">
+<input id="atividades" placeholder="Atividades" class="full">
+<input id="horario" placeholder="Horário de trabalho">
+
+<input id="empresa" placeholder="Empresa">
+<input id="cnpj" placeholder="CNPJ">
+
+<select id="unidade" class="full">
+<option value="">Selecionar unidade</option>
+<option>Sabará</option>
+<option>Águas Lindas</option>
+<option>Valparaíso</option>
+</select>
 
 <button onclick="salvar()">Salvar</button>
 <button onclick="voltar()">Cancelar</button>
@@ -32,109 +69,79 @@
 
 <script>
 
-if(localStorage.getItem("logado")!=="sim"){
-location="login.html"
-}
-
-/* ============================= */
-/* VERIFICAR EDIÇÃO */
-/* ============================= */
-
 const uidEditar = localStorage.getItem("funcionarioEditando")
 
 if(uidEditar){
-document.getElementById("titulo").innerText="Editar Funcionário"
-carregarParaEdicao()
+titulo.innerText="Editar Funcionário"
+carregar()
 }
 
-/* ============================= */
-/* CARREGAR DADOS PARA EDITAR */
-/* ============================= */
+async function carregar(){
 
-async function carregarParaEdicao(){
-
-const { data, error } = await supabaseClient
+const { data } = await supabaseClient
 .from("funcionarios")
 .select("*")
-.eq("uid", uidEditar)
+.eq("uid",uidEditar)
 .single()
 
-if(error){
-alert("Erro ao carregar dados para edição")
-console.error(error)
-return
+if(!data) return
+
+Object.keys(data).forEach(k=>{
+const el=document.getElementById(k)
+if(el) el.value=data[k]
+})
 }
-
-nome.value = data.nome || ""
-cpf.value = data.cpf || ""
-cargo.value = data.cargo || ""
-setor.value = data.setor || ""
-salario.value = data.salario || ""
-unidade.value = data.unidade || ""
-
-}
-
-/* ============================= */
-/* SALVAR */
-/* ============================= */
 
 async function salvar(){
 
 const funcionario={
-nome: nome.value,
-cpf: cpf.value,
-cargo: cargo.value,
-setor: setor.value,
-salario: Number(salario.value || 0),
-unidade: unidade.value
+nome:nome.value,
+email:email.value,
+celular:celular.value,
+nascimento:nascimento.value,
+genero:genero.value,
+sangue:sangue.value,
+cpf:cpf.value,
+rg:rg.value,
+ctps:ctps.value,
+nis:nis.value,
+funcao:funcao.value,
+cbo:cbo.value,
+categoria:categoria.value,
+matricula:matricula.value,
+entrada:entrada.value,
+atividades:atividades.value,
+horario:horario.value,
+empresa:empresa.value,
+cnpj:cnpj.value,
+unidade:unidade.value
 }
 
-/* EDITAR */
 if(uidEditar){
 
-const { error } = await supabaseClient
+await supabaseClient
 .from("funcionarios")
 .update(funcionario)
-.eq("uid", uidEditar)
+.eq("uid",uidEditar)
 
-if(error){
-alert("Erro ao atualizar funcionário")
-console.error(error)
-return
-}
-
-alert("Funcionário atualizado com sucesso")
 localStorage.removeItem("funcionarioEditando")
+alert("Atualizado")
 location="funcionarios.html"
 return
 }
 
-/* NOVO CADASTRO */
-
-const { error } = await supabaseClient
+await supabaseClient
 .from("funcionarios")
 .insert([funcionario])
 
-if(error){
-alert("Erro ao cadastrar funcionário")
-console.error(error)
-return
-}
-
-alert("Funcionário cadastrado com sucesso")
+alert("Cadastrado")
 location="funcionarios.html"
 }
 
-/* ============================= */
-/* VOLTAR */
-/* ============================= */
-
 function voltar(){
-localStorage.removeItem("funcionarioEditando")
 location="funcionarios.html"
 }
 
 </script>
-
 </body>
 </html>
