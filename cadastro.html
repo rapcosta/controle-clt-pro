@@ -1,12 +1,14 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>Cadastro Completo de Funcionário</title>
 <link rel="stylesheet" href="style.css">
+
+<!-- SUPABASE (carrega apenas uma vez e no lugar certo) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
 </head>
 
 <body>
@@ -107,14 +109,16 @@
 </form>
 </div>
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
 <script>
 
+/* proteção login */
 if(localStorage.getItem("logado")!=="sim"){
 window.location="login.html"
+}
+
+/* converte vazio em null (IMPORTANTE para PostgreSQL) */
+function vazioParaNull(v){
+return v === "" ? null : v
 }
 
 async function salvar(e){
@@ -125,7 +129,10 @@ unidade: unidadeFuncionario.value,
 empresa: empresa.value,
 cnpj: cnpj.value,
 nome: nome.value,
-nascimento: nascimento.value,
+
+nascimento: vazioParaNull(nascimento.value),
+admissao: vazioParaNull(admissao.value),
+
 naturalidade: naturalidade.value,
 nacionalidade: nacionalidade.value,
 estado_civil: estadoCivil.value,
@@ -149,11 +156,10 @@ ctps: ctps.value,
 titulo_eleitor: tituloEleitor.value,
 reservista: reservista.value,
 cnh: cnh.value,
-admissao: admissao.value,
 cargo: cargo.value,
 cbo: cbo.value,
 setor: setor.value,
-salario: Number(salario.value),
+salario: Number(salario.value)||0,
 tipo_contrato: tipoContrato.value,
 horario: horario.value,
 intervalo: intervalo.value,
