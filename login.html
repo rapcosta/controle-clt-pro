@@ -2,40 +2,65 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>Controle CLT Pro - Login</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <style>
 body{
-background:#111;
+background:#0f0f0f;
 color:white;
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
 font-family:Arial;
+margin:0;
 }
+
 .box{
 background:#1f1f1f;
-padding:30px;
-border-radius:10px;
-width:300px;
+padding:40px;
+border-radius:12px;
+width:320px;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+text-align:center;
 }
+
+.logo{
+width:120px;
+margin-bottom:20px;
+}
+
 input{
 width:100%;
-margin-bottom:10px;
-padding:8px;
+margin-bottom:12px;
+padding:10px;
 border-radius:6px;
 border:none;
+font-size:14px;
 }
+
 button{
 width:100%;
-padding:10px;
+padding:12px;
 border:none;
 border-radius:6px;
 cursor:pointer;
+font-size:15px;
+background:#2b7cff;
+color:white;
+}
+
+button:hover{
+background:#1f5ed6;
+}
+
+.erro{
+color:#ff4d4d;
+margin-top:10px;
+font-size:13px;
 }
 </style>
 </head>
@@ -43,25 +68,40 @@ cursor:pointer;
 <body>
 
 <div class="box">
-<h2>Login</h2>
 
-<input id="email" placeholder="Email">
+<img src="logo.png" class="logo">
+
+<h2>Entrar no sistema</h2>
+
+<input id="email" type="email" placeholder="Email">
 <input id="senha" type="password" placeholder="Senha">
 
 <button onclick="login()">Entrar</button>
+
+<div id="erro" class="erro"></div>
+
 </div>
 
 <script>
 
+/* ========================= */
+/* LOGIN REAL SUPABASE */
+/* ========================= */
 async function login(){
 
+const email=document.getElementById("email").value
+const senha=document.getElementById("senha").value
+const erroBox=document.getElementById("erro")
+
+erroBox.innerText=""
+
 const { data, error } = await supabaseClient.auth.signInWithPassword({
-email: email.value,
-password: senha.value
+email: email,
+password: senha
 })
 
 if(error){
-alert(error.message)
+erroBox.innerText="Email ou senha inválidos"
 console.error(error)
 return
 }
@@ -69,7 +109,22 @@ return
 location="dashboard.html"
 }
 
+/* ========================= */
+/* AUTO LOGIN SE JÁ LOGADO */
+/* ========================= */
+async function verificarSessao(){
+
+const { data } = await supabaseClient.auth.getSession()
+
+if(data.session){
+location="dashboard.html"
+}
+
+}
+
+verificarSessao()
 
 </script>
+
 </body>
 </html>
