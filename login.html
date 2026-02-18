@@ -55,18 +55,20 @@ cursor:pointer;
 
 async function login(){
 
-const { error } = await supabaseClient.auth.signInWithPassword({
+const { data, error } = await supabaseClient.auth.signInWithPassword({
 email: email.value,
 password: senha.value
 })
 
 if(error){
-alert("Email ou senha inválidos")
+alert(error.message)
+console.error(error)
 return
 }
 
 location="dashboard.html"
 }
+
 
 </script>
 </body>
