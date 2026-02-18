@@ -99,10 +99,13 @@ return
 
 /* redireciona somente quando estado real mudar */
 supabaseClient.auth.onAuthStateChange((event, session)=>{
-if(session){
-location="dashboard.html"
+
+if(event === "SIGNED_IN"){
+window.location.href = "dashboard.html"
 }
+
 })
+
 
 </script>
 
