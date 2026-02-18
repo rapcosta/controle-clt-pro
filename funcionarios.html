@@ -2,131 +2,18 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Funcionários - Controle CLT Pro</title>
-
-<link rel="stylesheet" href="style.css">
+<title>Funcionários</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-
-<style>
-
-/* ===== CONTAINER ===== */
-.container{
-max-width:1200px;
-margin:40px auto;
-text-align:center;
-}
-
-/* ===== BARRA SUPERIOR ===== */
-.top-bar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
-gap:10px;
-flex-wrap:wrap;
-}
-
-.top-bar input,
-.top-bar select{
-padding:8px 12px;
-border-radius:6px;
-border:none;
-background:#2a2a2a;
-color:white;
-}
-
-/* ===== TABELA ===== */
-table{
-width:100%;
-border-collapse:collapse;
-background:#1c1c1c;
-border-radius:10px;
-overflow:hidden;
-box-shadow:0 0 20px rgba(0,0,0,0.4);
-}
-
-thead{
-background:#2a2a2a;
-}
-
-th{
-padding:14px;
-}
-
-td{
-padding:12px;
-border-top:1px solid #333;
-}
-
-th, td{
-white-space:nowrap;
-}
-
-td:nth-child(1){ min-width:260px; text-align:left; }
-td:nth-child(2){ min-width:160px; }
-td:nth-child(3){ min-width:180px; }
-td:nth-child(4){ min-width:180px; }
-
-tbody tr:hover{
-background:#2f2f2f;
-}
-
-/* BOTÕES */
-button{
-border:none;
-padding:7px 12px;
-border-radius:6px;
-cursor:pointer;
-margin:2px;
-font-size:13px;
-}
-
-.btn-ver{ background:#2f5f8a; color:white; }
-.btn-editar{ background:#3a7a3a; color:white; }
-.btn-excluir{ background:#7a2f2f; color:white; }
-
-button:hover{
-transform:scale(1.05);
-}
-
-.voltar{
-margin-top:25px;
-padding:10px 20px;
-background:#444;
-color:white;
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="container">
-
 <h1>Funcionários</h1>
 
-<!-- ===== FILTROS ===== -->
-<div class="top-bar">
-
-<input
-type="text"
-placeholder="Pesquisar funcionário..."
-id="pesquisa"
-oninput="aplicarFiltros()"
->
-
-<select id="filtroUnidade" onchange="aplicarFiltros()">
-<option value="">Todas unidades</option>
-<option>Sabará</option>
-<option>Ocidental</option>
-<option>Águas Lindas</option>
-<option>Cruzeiro da Fortaleza</option>
-<option>Guimarânia</option>
-</select>
-
-</div>
+<input id="pesquisa" placeholder="Pesquisar nome..." oninput="filtrar()">
 
 <table>
 <thead>
@@ -138,13 +25,10 @@ oninput="aplicarFiltros()"
 <th>Ações</th>
 </tr>
 </thead>
-
-<tbody id="listaFuncionarios"></tbody>
+<tbody id="lista"></tbody>
 </table>
 
-<button class="voltar" onclick="window.location='dashboard.html'">Voltar</button>
-
-</div>
+<button onclick="voltar()">Voltar</button>
 
 <script>
 
@@ -152,12 +36,8 @@ if(localStorage.getItem("logado")!=="sim"){
 location="login.html"
 }
 
-let funcionarios = []
-let funcionariosFiltrados = []
+let funcionarios=[]
 
-/* ============================= */
-/* CARREGAR */
-/* ============================= */
 async function carregarFuncionarios(){
 
 const { data, error } = await supabaseClient
@@ -171,97 +51,79 @@ console.error(error)
 return
 }
 
-funcionarios = data
-funcionariosFiltrados = data
-renderTabela()
+funcionarios=data
+renderTabela(data)
 }
 
-/* ============================= */
-/* FILTROS */
-/* ============================= */
-function aplicarFiltros(){
+function renderTabela(lista){
 
-const termo = document.getElementById("pesquisa").value.toLowerCase()
-const unidade = document.getElementById("filtroUnidade").value
+const tbody=document.getElementById("lista")
+tbody.innerHTML=""
 
-funcionariosFiltrados = funcionarios.filter(f=>{
+lista.forEach(f=>{
 
-const matchPesquisa =
-(f.nome||"").toLowerCase().includes(termo) ||
-(f.cpf||"").toLowerCase().includes(termo) ||
-(f.cargo||"").toLowerCase().includes(termo)
-
-const matchUnidade =
-!unidade || f.unidade === unidade
-
-return matchPesquisa && matchUnidade
-})
-
-renderTabela()
-}
-
-/* ============================= */
-/* TABELA */
-/* ============================= */
-function renderTabela(){
-
-const lista = document.getElementById("listaFuncionarios")
-lista.innerHTML=""
-
-funcionariosFiltrados.forEach((f,i)=>{
-
-lista.innerHTML += `
+tbody.innerHTML+=`
 <tr>
 <td>${f.nome||""}</td>
 <td>${f.cpf||""}</td>
 <td>${f.cargo||""}</td>
 <td>${f.setor||""}</td>
-
 <td>
-<button class="btn-ver" onclick="ver('${f.id}')">Ver</button>
-<button class="btn-editar" onclick="editar('${f.id}')">Editar</button>
-<button class="btn-excluir" onclick="excluir('${f.id}')">Excluir</button>
+<button onclick="ver('${f.uid}')">Ver</button>
+<button onclick="editar('${f.uid}')">Editar</button>
+<button onclick="excluir('${f.uid}')">Excluir</button>
 </td>
 </tr>
 `
 })
-
 }
 
-/* ============================= */
-/* AÇÕES */
-/* ============================= */
-function ver(id){
-localStorage.setItem("funcionarioSelecionado", id)
+function filtrar(){
+
+const termo=document.getElementById("pesquisa").value.toLowerCase()
+
+const filtrados=funcionarios.filter(f=>
+(f.nome||"").toLowerCase().includes(termo)
+)
+
+renderTabela(filtrados)
+}
+
+function ver(uid){
+localStorage.setItem("funcionarioUID",uid)
 location="ficha.html"
 }
 
-function editar(id){
-localStorage.setItem("funcionarioEditando", id)
-location="ficha.html"
+function editar(uid){
+localStorage.setItem("funcionarioEditando",uid)
+location="cadastro.html"
 }
 
-async function excluir(id){
+async function excluir(uid){
 
 if(!confirm("Excluir funcionário?")) return
 
 const { error } = await supabaseClient
 .from("funcionarios")
 .delete()
-.eq("id", id)
+.eq("uid",uid)
 
 if(error){
 alert("Erro ao excluir")
+console.error(error)
 return
 }
 
+alert("Excluído com sucesso")
 carregarFuncionarios()
 }
 
-/* ============================= */
+function voltar(){
+location="dashboard.html"
+}
+
 carregarFuncionarios()
 
 </script>
-
 </body>
 </html>

@@ -1,189 +1,67 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<title>Cadastro Completo de Funcionário</title>
-<link rel="stylesheet" href="style.css">
-
-<!-- SUPABASE (carrega apenas uma vez e no lugar certo) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
-</head>
-
-<body>
-
-<div class="form-container">
-<h1>Cadastro Completo do Funcionário</h1>
-
-<form onsubmit="salvar(event)">
-
-<!-- UNIDADE -->
-<div class="secao">
-<h2>Unidade do Funcionário</h2>
-<select id="unidadeFuncionario" required>
-<option value="">Selecione a unidade</option>
-<option>Sabará</option>
-<option>Ocidental</option>
-<option>Águas Lindas</option>
-<option>Cruzeiro da Fortaleza</option>
-<option>Guimarânia</option>
-</select>
-</div>
-
-<!-- EMPRESA -->
-<div class="secao">
-<h2>Empresa</h2>
-<input id="empresa" placeholder="Empresa">
-<input id="cnpj" placeholder="CNPJ">
-</div>
-
-<!-- DADOS PESSOAIS -->
-<div class="secao">
-<h2>Dados Pessoais</h2>
-<input id="nome" placeholder="Nome completo">
-<input type="date" id="nascimento">
-<input id="naturalidade" placeholder="Naturalidade">
-<input id="nacionalidade" placeholder="Nacionalidade">
-<input id="estadoCivil" placeholder="Estado civil">
-<input id="instrucao" placeholder="Instrução">
-<input id="nomePai" placeholder="Nome do pai">
-<input id="nomeMae" placeholder="Nome da mãe">
-<input id="raca" placeholder="Raça">
-<select id="deficiencia">
-<option>Não</option>
-<option>Sim</option>
-</select>
-</div>
-
-<!-- ENDEREÇO -->
-<div class="secao">
-<h2>Endereço</h2>
-<input id="endereco" placeholder="Endereço">
-<input id="bairro" placeholder="Bairro">
-<input id="cidade" placeholder="Cidade">
-<input id="uf" placeholder="UF">
-<input id="cep" placeholder="CEP">
-<input id="telefone" placeholder="Telefone">
-<input id="celular" placeholder="Celular">
-<input id="email" placeholder="Email">
-</div>
-
-<!-- DOCUMENTOS -->
-<div class="secao">
-<h2>Documentos</h2>
-<input id="cpf" placeholder="CPF">
-<input id="rg" placeholder="RG">
-<input id="pis" placeholder="PIS">
-<input id="ctps" placeholder="CTPS">
-<input id="tituloEleitor" placeholder="Título eleitor">
-<input id="reservista" placeholder="Reservista">
-<input id="cnh" placeholder="CNH">
-</div>
-
-<!-- CONTRATO -->
-<div class="secao">
-<h2>Contrato</h2>
-<input type="date" id="admissao">
-<input id="cargo" placeholder="Cargo">
-<input id="cbo" placeholder="CBO">
-<input id="setor" placeholder="Setor">
-<input type="number" id="salario" placeholder="Salário">
-<input id="tipoContrato" placeholder="Tipo contrato">
-<input id="horario" placeholder="Horário">
-<input id="intervalo" placeholder="Intervalo">
-<input id="dsr" placeholder="DSR">
-</div>
-
-<!-- BANCO -->
-<div class="secao">
-<h2>Banco</h2>
-<input id="banco" placeholder="Banco">
-<input id="agencia" placeholder="Agência">
-<input id="conta" placeholder="Conta">
-</div>
-
-<button type="submit">Salvar Funcionário</button>
-<button type="button" onclick="window.location='dashboard.html'">Voltar</button>
-
-</form>
-</div>
-
 <script>
 
-/* proteção login */
-if(localStorage.getItem("logado")!=="sim"){
-window.location="login.html"
+const uidEditar=localStorage.getItem("funcionarioEditando")
+
+if(uidEditar){
+carregarParaEdicao()
 }
 
-/* converte vazio em null (IMPORTANTE para PostgreSQL) */
-function vazioParaNull(v){
-return v === "" ? null : v
+async function carregarParaEdicao(){
+
+const { data } = await supabaseClient
+.from("funcionarios")
+.select("*")
+.eq("uid",uidEditar)
+.single()
+
+if(!data) return
+
+nome.value=data.nome||""
+cpf.value=data.cpf||""
+cargo.value=data.cargo||""
+setor.value=data.setor||""
+salario.value=data.salario||""
 }
 
-async function salvar(e){
-e.preventDefault()
+async function salvar(){
 
-const funcionario = {
-unidade: unidadeFuncionario.value,
-empresa: empresa.value,
-cnpj: cnpj.value,
-nome: nome.value,
-
-nascimento: vazioParaNull(nascimento.value),
-admissao: vazioParaNull(admissao.value),
-
-naturalidade: naturalidade.value,
-nacionalidade: nacionalidade.value,
-estado_civil: estadoCivil.value,
-nome_pai: nomePai.value,
-nome_mae: nomeMae.value,
-instrucao: instrucao.value,
-raca: raca.value,
-deficiencia: deficiencia.value,
-endereco: endereco.value,
-bairro: bairro.value,
-cidade: cidade.value,
-uf: uf.value,
-cep: cep.value,
-telefone: telefone.value,
-celular: celular.value,
-email: email.value,
-cpf: cpf.value,
-rg: rg.value,
-pis: pis.value,
-ctps: ctps.value,
-titulo_eleitor: tituloEleitor.value,
-reservista: reservista.value,
-cnh: cnh.value,
-cargo: cargo.value,
-cbo: cbo.value,
-setor: setor.value,
-salario: Number(salario.value)||0,
-tipo_contrato: tipoContrato.value,
-horario: horario.value,
-intervalo: intervalo.value,
-dsr: dsr.value,
-banco: banco.value,
-agencia: agencia.value,
-conta: conta.value
+const funcionario={
+nome:nome.value,
+cpf:cpf.value,
+cargo:cargo.value,
+setor:setor.value,
+salario:Number(salario.value||0)
 }
+
+if(uidEditar){
+
+const { error } = await supabaseClient
+.from("funcionarios")
+.update(funcionario)
+.eq("uid",uidEditar)
+
+if(error){
+alert("Erro ao atualizar")
+return
+}
+
+alert("Atualizado com sucesso")
+localStorage.removeItem("funcionarioEditando")
+location="funcionarios.html"
+
+}else{
 
 const { error } = await supabaseClient
 .from("funcionarios")
 .insert([funcionario])
 
 if(error){
-console.log(error)
 alert("Erro ao cadastrar")
 return
 }
 
-alert("Funcionário cadastrado com sucesso")
-window.location="funcionarios.html"
+alert("Cadastrado com sucesso")
+location="funcionarios.html"
 }
-
+}
 </script>
-
-</body>
-</html>

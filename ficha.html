@@ -1,89 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Ficha Funcionário</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h2 id="nome"></h2>
+
+<p>CPF: <span id="cpf"></span></p>
+<p>Cargo: <span id="cargo"></span></p>
+<p>Setor: <span id="setor"></span></p>
+<p>Salário: <span id="salario"></span></p>
+
+<button onclick="editar()">Editar</button>
+<button onclick="voltar()">Voltar</button>
+
 <script>
 
-if(localStorage.getItem("logado")!=="sim"){
-location="login.html"
-}
+const uid=localStorage.getItem("funcionarioUID")
 
-/* pegar id correto */
-const id =
-localStorage.getItem("funcionarioEditando") ||
-localStorage.getItem("funcionarioSelecionado")
-
-if(!id){
+if(!uid){
 alert("Funcionário não encontrado")
 location="funcionarios.html"
 }
 
-/* ============================= */
-/* CARREGAR FUNCIONÁRIO */
-/* ============================= */
 async function carregar(){
 
 const { data, error } = await supabaseClient
 .from("funcionarios")
 .select("*")
-.eq("uid", id)   // ← AQUI É O MAIS IMPORTANTE
+.eq("uid",uid)
 .single()
 
 if(error){
 alert("Erro ao carregar funcionário")
 console.error(error)
-location="funcionarios.html"
 return
 }
 
-mostrar(data)
+document.getElementById("nome").innerText=data.nome||""
+document.getElementById("cpf").innerText=data.cpf||""
+document.getElementById("cargo").innerText=data.cargo||""
+document.getElementById("setor").innerText=data.setor||""
+document.getElementById("salario").innerText=data.salario||""
 }
 
-function mostrar(f){
-
-tituloNome.innerText = f.nome || ""
-cpf.innerText = f.cpf || "-"
-cargo.innerText = f.cargo || "-"
-setor.innerText = f.setor || "-"
-salario.innerText = "R$ " + Number(f.salario||0).toFixed(2)
-
-}
-
-/* ============================= */
-/* EDITAR */
-/* ============================= */
 function editar(){
-
-document.querySelectorAll(".valor").forEach(el=>{
-const campo = el.id
-const valor = el.innerText.replace("R$ ","")
-el.innerHTML = `<input id="edit_${campo}" value="${valor}">`
-})
-
-btnSalvar.style.display="inline-block"
-}
-
-/* ============================= */
-/* SALVAR */
-/* ============================= */
-async function salvar(){
-
-const atualizacao = {}
-
-document.querySelectorAll("[id^='edit_']").forEach(input=>{
-const campo = input.id.replace("edit_","")
-atualizacao[campo] = input.value
-})
-
-const { error } = await supabaseClient
-.from("funcionarios")
-.update(atualizacao)
-.eq("uid", id)   // ← IMPORTANTE
-
-if(error){
-alert("Erro ao salvar")
-console.error(error)
-return
-}
-
-alert("Alterações salvas")
-location.reload()
+localStorage.setItem("funcionarioEditando",uid)
+location="cadastro.html"
 }
 
 function voltar(){
@@ -93,3 +63,5 @@ location="funcionarios.html"
 carregar()
 
 </script>
+</body>
+</html>
