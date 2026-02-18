@@ -1,0 +1,162 @@
+<button onclick="logout()">Sair</button>
+
+<script>
+async function logout(){
+await supabaseClient.auth.signOut()
+location="login.html"
+}
+</script>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Funcionários</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Funcionários</h1>
+
+<input id="pesquisa" placeholder="Pesquisar nome..." oninput="filtrar()">
+
+<select id="filtroUnidade" onchange="filtrar()">
+<option value="">Todas unidades</option>
+<option value="Sabará">Sabará</option>
+<option value="Águas Lindas">Águas Lindas</option>
+<option value="Valparaíso">Valparaíso</option>
+</select>
+
+<table>
+<thead>
+<tr>
+<th>Nome</th>
+<th>CPF</th>
+<th>Cargo</th>
+<th>Setor</th>
+<th>Ações</th>
+</tr>
+</thead>
+<tbody id="lista"></tbody>
+</table>
+
+<button onclick="voltar()">Voltar</button>
+
+<script>
+    async function verificarLogin(){
+
+const { data } = await supabaseClient.auth.getSession()
+
+if(!data.session){
+location="login.html"
+}
+
+}
+
+verificarLogin()
+
+
+if(localStorage.getItem("logado")!=="sim"){
+location="login.html"
+}
+
+let funcionarios=[]
+
+async function carregarFuncionarios(){
+
+const { data, error } = await supabaseClient
+.from("funcionarios")
+.select("*")
+.order("nome",{ascending:true})
+
+if(error){
+alert("Erro ao carregar funcionários")
+console.error(error)
+return
+}
+
+funcionarios=data
+renderTabela(data)
+}
+
+function renderTabela(lista){
+
+const tbody=document.getElementById("lista")
+tbody.innerHTML=""
+
+lista.forEach(f=>{
+
+tbody.innerHTML+=`
+<tr>
+<td>${f.nome||""}</td>
+<td>${f.cpf||""}</td>
+<td>${f.cargo||""}</td>
+<td>${f.setor||""}</td>
+<td>
+<button onclick="ver('${f.uid}')">Ver</button>
+<button onclick="editar('${f.uid}')">Editar</button>
+<button onclick="excluir('${f.uid}')">Excluir</button>
+</td>
+</tr>
+`
+})
+}
+
+function filtrar(){
+
+const termo=document.getElementById("pesquisa").value.toLowerCase()
+const unidade=document.getElementById("filtroUnidade").value
+
+const filtrados=funcionarios.filter(f=>{
+
+const nomeMatch=(f.nome||"").toLowerCase().includes(termo)
+const unidadeMatch=!unidade || f.unidade===unidade
+
+return nomeMatch && unidadeMatch
+})
+
+renderTabela(filtrados)
+}
+
+function ver(uid){
+localStorage.setItem("funcionarioUID",uid)
+location="ficha.html"
+}
+
+function editar(uid){
+localStorage.setItem("funcionarioEditando",uid)
+location="cadastro.html"
+}
+
+async function excluir(uid){
+
+if(!confirm("Excluir funcionário?")) return
+
+const { error } = await supabaseClient
+.from("funcionarios")
+.delete()
+.eq("uid",uid)
+
+if(error){
+alert("Erro ao excluir")
+console.error(error)
+return
+}
+
+alert("Excluído com sucesso")
+carregarFuncionarios()
+}
+
+function voltar(){
+location="dashboard.html"
+}
+
+carregarFuncionarios()
+
+</script>
+</body>
+</html>

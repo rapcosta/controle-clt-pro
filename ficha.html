@@ -1,0 +1,87 @@
+<button onclick="logout()">Sair</button>
+
+<script>
+async function logout(){
+await supabaseClient.auth.signOut()
+location="login.html"
+}
+</script>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Ficha Funcionário</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h2 id="nome"></h2>
+
+<p>CPF: <span id="cpf"></span></p>
+<p>Cargo: <span id="cargo"></span></p>
+<p>Setor: <span id="setor"></span></p>
+<p>Salário: <span id="salario"></span></p>
+
+<button onclick="editar()">Editar</button>
+<button onclick="voltar()">Voltar</button>
+
+<script>
+async function verificarLogin(){
+
+const { data } = await supabaseClient.auth.getSession()
+
+if(!data.session){
+location="login.html"
+}
+
+}
+
+verificarLogin()
+
+const uid=localStorage.getItem("funcionarioUID")
+
+if(!uid){
+alert("Funcionário não encontrado")
+location="funcionarios.html"
+}
+
+async function carregar(){
+
+const { data, error } = await supabaseClient
+.from("funcionarios")
+.select("*")
+.eq("uid",uid)
+.single()
+
+if(error){
+alert("Erro ao carregar funcionário")
+console.error(error)
+return
+}
+
+document.getElementById("nome").innerText=data.nome||""
+document.getElementById("cpf").innerText=data.cpf||""
+document.getElementById("cargo").innerText=data.cargo||""
+document.getElementById("setor").innerText=data.setor||""
+document.getElementById("salario").innerText=data.salario||""
+}
+
+function editar(){
+localStorage.setItem("funcionarioEditando",uid)
+location="cadastro.html"
+}
+
+function voltar(){
+location="funcionarios.html"
+}
+
+carregar()
+
+</script>
+</body>
+</html>

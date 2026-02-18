@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Painel do Sistema - Controle CLT Pro</title>
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Painel do Sistema</h1>
+<p id="usuarioLogado"></p>
+
+<div class="menu">
+
+<button onclick="location='funcionarios.html'">Funcionários</button>
+<button onclick="location='contracheque.html'">Gerar Contracheque</button>
+<button onclick="location='cadastro.html'">Cadastrar Funcionário</button>
+<button onclick="location='historico.html'">Histórico</button>
+<button onclick="location='usuarios.html'">Gerenciar Usuários</button>
+<button onclick="location='importar.html'">Importar Excel</button>
+
+</div>
+
+<button onclick="logout()">Sair</button>
+
+</div>
+
+<script>
+
+/* proteção real */
+supabaseClient.auth.onAuthStateChange((event, session)=>{
+
+if(!session){
+location="login.html"
+}else{
+document.getElementById("usuarioLogado").innerText =
+"Logado como: " + session.user.email
+}
+
+})
+
+async function logout(){
+await supabaseClient.auth.signOut()
+}
+
+</script>
+
+</body>
+</html>

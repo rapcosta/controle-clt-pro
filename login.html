@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Controle CLT Pro - Login</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<style>
+body{
+background:#0f0f0f;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-family:Arial;
+margin:0;
+}
+
+.box{
+background:#1f1f1f;
+padding:40px;
+border-radius:12px;
+width:320px;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+text-align:center;
+}
+
+.logo{
+width:120px;
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+margin-bottom:12px;
+padding:10px;
+border-radius:6px;
+border:none;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#2b7cff;
+color:white;
+}
+
+.erro{
+color:#ff4d4d;
+margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<img src="logo.png" class="logo">
+
+<h2>Entrar no sistema</h2>
+
+<input id="email" type="email" placeholder="Email">
+<input id="senha" type="password" placeholder="Senha">
+
+<button onclick="login()">Entrar</button>
+
+<div id="erro" class="erro"></div>
+
+</div>
+
+<script>
+
+async function login(){
+
+const email=document.getElementById("email").value
+const senha=document.getElementById("senha").value
+const erro=document.getElementById("erro")
+
+erro.innerText=""
+
+const { error } = await supabaseClient.auth.signInWithPassword({
+email,
+password: senha
+})
+
+if(error){
+erro.innerText="Email ou senha inválidos"
+return
+}
+
+}
+
+/* redireciona somente quando estado real mudar */
+supabaseClient.auth.onAuthStateChange((event, session)=>{
+if(session){
+location="dashboard.html"
+}
+})
+
+</script>
+
+</body>
+</html>

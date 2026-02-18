@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gerenciar Usuários</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Gerenciar Usuários</h1>
+
+<h3>Novo usuário</h3>
+
+<input id="novoNome" placeholder="Usuário">
+<input id="novaSenha" placeholder="Senha">
+
+<label>Unidade</label>
+<select id="unidadeUsuario" required>
+<option value="">Selecione a unidade</option>
+<option>Sabará</option>
+<option>Ocidental</option>
+<option>Águas Lindas</option>
+<option>Cruzeiro da Fortaleza</option>
+<option>Guimarânia</option>
+</select>
+
+<br><br>
+
+<button onclick="cadastrar()">Criar usuário</button>
+
+<hr>
+
+<h3>Usuários cadastrados</h3>
+<div id="listaUsuarios"></div>
+
+<br>
+<button onclick="window.location='dashboard.html'">Voltar</button>
+
+</div>
+
+<script src="usuarios.js"></script>
+
+</body>
+</html>

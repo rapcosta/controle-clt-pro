@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Histórico de Contracheques</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Histórico de Contracheques</h1>
+
+<div id="lista"></div>
+
+<br>
+<button onclick="voltar()">Voltar</button>
+
+</div>
+
+<script>
+
+/* proteção login */
+if(localStorage.getItem("logado") !== "sim"){
+window.location="login.html"
+}
+
+const funcionarios = JSON.parse(localStorage.getItem("funcionarios")) || []
+const historico = JSON.parse(localStorage.getItem("contracheques")) || []
+
+function carregar(){
+
+if(historico.length === 0){
+document.getElementById("lista").innerHTML="Nenhum contracheque gerado"
+return
+}
+
+let html=""
+
+historico.forEach((c,index)=>{
+
+const func = funcionarios[c.funcionarioIndex]
+
+html+=`
+<div style="background:#1f1f1f;padding:12px;margin-bottom:10px;border-radius:6px;">
+<b>${func.nome}</b><br>
+Competência: ${c.mes}/${c.ano}<br>
+
+<button onclick="reimprimir(${index})">Reimprimir PDF</button>
+<button onclick="excluir(${index})">Excluir</button>
+</div>
+`
+})
+
+document.getElementById("lista").innerHTML=html
+}
+
+function reimprimir(i){
+localStorage.setItem("contrachequeReimprimir", i)
+window.location="reimprimir.html"
+}
+
+function excluir(i){
+if(confirm("Excluir contracheque?")){
+historico.splice(i,1)
+localStorage.setItem("contracheques", JSON.stringify(historico))
+carregar()
+}
+}
+
+function voltar(){
+window.location="dashboard.html"
+}
+
+carregar()
+
+</script>
+
+</body>
+</html>
