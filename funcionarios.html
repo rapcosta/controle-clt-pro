@@ -1,8 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Funcionários - Controle CLT Pro</title>
+<link rel="stylesheet" href="style.css">
+
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Funcionários</h1>
+
+<table border="1" width="100%">
+<thead>
+<tr>
+<th>Nome</th>
+<th>CPF</th>
+<th>Cargo</th>
+<th>Setor</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody id="listaFuncionarios"></tbody>
+</table>
+
+<br>
+<button onclick="window.location='dashboard.html'">Voltar</button>
+
+</div>
+
 <script>
 
+/* ========================= */
+/* PROTEÇÃO LOGIN */
+/* ========================= */
 if(localStorage.getItem("logado")!=="sim"){
 location="login.html"
 }
@@ -35,53 +73,30 @@ renderTabela()
 function renderTabela(){
 
 const lista = document.getElementById("listaFuncionarios")
+
+if(!lista){
+console.error("Elemento listaFuncionarios não existe")
+return
+}
+
 lista.innerHTML=""
 
 funcionarios.forEach((f,i)=>{
 
 lista.innerHTML += `
 <tr>
-<td>${f.nome || ""}</td>
-<td>${f.cpf || ""}</td>
-<td>${f.cargo || ""}</td>
-<td>${f.setor || ""}</td>
+<td>${f.nome||""}</td>
+<td>${f.cpf||""}</td>
+<td>${f.cargo||""}</td>
+<td>${f.setor||""}</td>
 
-<td class="acoes">
-
-<button class="btn-ver" onclick="ver(${i})">Ver</button>
-<button class="btn-editar" onclick="editar(${i})">Editar</button>
-<button class="btn-contra" onclick="contracheque(${i})">Contracheque</button>
-<button class="btn-excluir" onclick="excluir(${i})">Excluir</button>
-
+<td>
+<button onclick="excluir(${i})">Excluir</button>
 </td>
 </tr>
 `
 })
 
-}
-
-/* ============================= */
-/* VER FUNCIONÁRIO */
-/* ============================= */
-function ver(i){
-localStorage.setItem("funcionarioSelecionado", funcionarios[i].id)
-location="ficha.html"
-}
-
-/* ============================= */
-/* EDITAR FUNCIONÁRIO */
-/* ============================= */
-function editar(i){
-localStorage.setItem("funcionarioEditando", funcionarios[i].id)
-location="ficha.html"
-}
-
-/* ============================= */
-/* CONTRACHEQUE */
-/* ============================= */
-function contracheque(i){
-localStorage.setItem("funcionarioSelecionado", funcionarios[i].id)
-location="contracheque.html"
 }
 
 /* ============================= */
@@ -104,7 +119,7 @@ console.error(error)
 return
 }
 
-alert("Funcionário excluído com sucesso")
+alert("Funcionário excluído")
 carregarFuncionarios()
 }
 
@@ -114,3 +129,6 @@ carregarFuncionarios()
 carregarFuncionarios()
 
 </script>
+
+</body>
+</html>
