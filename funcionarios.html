@@ -15,6 +15,13 @@
 
 <input id="pesquisa" placeholder="Pesquisar nome..." oninput="filtrar()">
 
+<select id="filtroUnidade" onchange="filtrar()">
+<option value="">Todas unidades</option>
+<option value="Sabará">Sabará</option>
+<option value="Águas Lindas">Águas Lindas</option>
+<option value="Valparaíso">Valparaíso</option>
+</select>
+
 <table>
 <thead>
 <tr>
@@ -81,10 +88,15 @@ tbody.innerHTML+=`
 function filtrar(){
 
 const termo=document.getElementById("pesquisa").value.toLowerCase()
+const unidade=document.getElementById("filtroUnidade").value
 
-const filtrados=funcionarios.filter(f=>
-(f.nome||"").toLowerCase().includes(termo)
-)
+const filtrados=funcionarios.filter(f=>{
+
+const nomeMatch=(f.nome||"").toLowerCase().includes(termo)
+const unidadeMatch=!unidade || f.unidade===unidade
+
+return nomeMatch && unidadeMatch
+})
 
 renderTabela(filtrados)
 }

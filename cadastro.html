@@ -1,67 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Cadastro de Funcionário</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+</head>
+
+<body>
+
+<h1 id="titulo">Cadastrar Funcionário</h1>
+
+<div class="container">
+
+<input id="nome" placeholder="Nome completo">
+<input id="cpf" placeholder="CPF">
+<input id="cargo" placeholder="Cargo">
+<input id="setor" placeholder="Setor">
+<input id="salario" placeholder="Salário">
+<input id="unidade" placeholder="Unidade (Sabará, Águas Lindas...)">
+
+<br><br>
+
+<button onclick="salvar()">Salvar</button>
+<button onclick="voltar()">Cancelar</button>
+
+</div>
+
 <script>
 
-const uidEditar=localStorage.getItem("funcionarioEditando")
+if(localStorage.getItem("logado")!=="sim"){
+location="login.html"
+}
+
+/* ============================= */
+/* VERIFICAR EDIÇÃO */
+/* ============================= */
+
+const uidEditar = localStorage.getItem("funcionarioEditando")
 
 if(uidEditar){
+document.getElementById("titulo").innerText="Editar Funcionário"
 carregarParaEdicao()
 }
 
+/* ============================= */
+/* CARREGAR DADOS PARA EDITAR */
+/* ============================= */
+
 async function carregarParaEdicao(){
 
-const { data } = await supabaseClient
+const { data, error } = await supabaseClient
 .from("funcionarios")
 .select("*")
-.eq("uid",uidEditar)
+.eq("uid", uidEditar)
 .single()
 
-if(!data) return
-
-nome.value=data.nome||""
-cpf.value=data.cpf||""
-cargo.value=data.cargo||""
-setor.value=data.setor||""
-salario.value=data.salario||""
+if(error){
+alert("Erro ao carregar dados para edição")
+console.error(error)
+return
 }
+
+nome.value = data.nome || ""
+cpf.value = data.cpf || ""
+cargo.value = data.cargo || ""
+setor.value = data.setor || ""
+salario.value = data.salario || ""
+unidade.value = data.unidade || ""
+
+}
+
+/* ============================= */
+/* SALVAR */
+/* ============================= */
 
 async function salvar(){
 
 const funcionario={
-nome:nome.value,
-cpf:cpf.value,
-cargo:cargo.value,
-setor:setor.value,
-salario:Number(salario.value||0)
+nome: nome.value,
+cpf: cpf.value,
+cargo: cargo.value,
+setor: setor.value,
+salario: Number(salario.value || 0),
+unidade: unidade.value
 }
 
+/* EDITAR */
 if(uidEditar){
 
 const { error } = await supabaseClient
 .from("funcionarios")
 .update(funcionario)
-.eq("uid",uidEditar)
+.eq("uid", uidEditar)
 
 if(error){
-alert("Erro ao atualizar")
+alert("Erro ao atualizar funcionário")
+console.error(error)
 return
 }
 
-alert("Atualizado com sucesso")
+alert("Funcionário atualizado com sucesso")
 localStorage.removeItem("funcionarioEditando")
 location="funcionarios.html"
+return
+}
 
-}else{
+/* NOVO CADASTRO */
 
 const { error } = await supabaseClient
 .from("funcionarios")
 .insert([funcionario])
 
 if(error){
-alert("Erro ao cadastrar")
+alert("Erro ao cadastrar funcionário")
+console.error(error)
 return
 }
 
-alert("Cadastrado com sucesso")
+alert("Funcionário cadastrado com sucesso")
 location="funcionarios.html"
 }
+
+/* ============================= */
+/* VOLTAR */
+/* ============================= */
+
+function voltar(){
+localStorage.removeItem("funcionarioEditando")
+location="funcionarios.html"
 }
+
 </script>
+
+</body>
+</html>
