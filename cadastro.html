@@ -18,10 +18,6 @@ body{
     width:600px;
 }
 
-h1{
-    margin-bottom:20px;
-}
-
 .secao{
     background:#151515;
     padding:20px;
@@ -59,14 +55,14 @@ textarea{
     min-height:70px;
 }
 
-.justificativa{
+.oculto{
     display:none;
-    margin-top:5px;
 }
 
 .botoes{
     margin-top:30px;
 }
+
 button{
     padding:10px 20px;
     border:none;
@@ -98,7 +94,6 @@ button{
 <label>CNPJ</label>
 <input id="empresa_cnpj">
 </div>
-
 </div>
 
 <!-- DADOS PESSOAIS -->
@@ -118,18 +113,16 @@ button{
 <!-- DEFICIÊNCIA -->
 <div class="campo">
 <label>Deficiência</label>
-<select id="deficiencia" onchange="toggleJustificativa(this,'just_deficiencia')">
-<option value="Não">Não</option>
-<option value="Sim">Sim</option>
+<select onchange="toggleSimNao(this,'just_deficiencia')">
+<option>Não</option>
+<option>Sim</option>
 </select>
-<textarea id="just_deficiencia" class="justificativa" placeholder="Tipo..."></textarea>
+<textarea id="just_deficiencia" class="oculto" placeholder="Descreva a deficiência"></textarea>
 </div>
 
 <!-- DEPENDENTES -->
 <div class="campo">
-<div class="campo">
 <label>Dependentes</label>
-
 <select onchange="toggleDependentes(this)">
 <option>Não</option>
 <option>Sim</option>
@@ -137,25 +130,20 @@ button{
 
 <input type="number"
 id="qtd_dependentes"
-class="justificativa"
+class="oculto"
 min="0"
 max="50"
-placeholder="Quantidade de dependentes">
+placeholder="Quantidade (0 a 50)">
 
 <textarea id="just_dependentes"
-class="justificativa"
-placeholder="Informe nomes ou detalhes dos dependentes...">
+class="oculto"
+placeholder="Informações dos dependentes">
 </textarea>
-
-</div>
-
-
 </div>
 
 <!-- FILHOS -->
 <div class="campo">
 <label>Filhos (Salário Família)</label>
-
 <select onchange="toggleFilhos(this)">
 <option>Não</option>
 <option>Sim</option>
@@ -163,16 +151,15 @@ placeholder="Informe nomes ou detalhes dos dependentes...">
 
 <input type="number"
 id="qtd_filhos"
-class="justificativa"
+class="oculto"
 min="0"
 max="50"
-placeholder="Quantidade de filhos">
+placeholder="Quantidade (0 a 50)">
 
 <textarea id="just_filhos"
-class="justificativa"
-placeholder="Informações sobre os filhos...">
+class="oculto"
+placeholder="Informações dos filhos">
 </textarea>
-
 </div>
 
 </div>
@@ -189,10 +176,9 @@ placeholder="Informações sobre os filhos...">
 <div class="campo"><label>Telefone</label><input id="telefone"></div>
 <div class="campo"><label>Celular</label><input id="celular"></div>
 <div class="campo"><label>Email</label><input id="email"></div>
-
 </div>
 
-<!-- DOCUMENTOS -->
+<!-- DOCUMENTAÇÃO -->
 <div class="secao">
 <h2>Documentação</h2>
 
@@ -203,7 +189,6 @@ placeholder="Informações sobre os filhos...">
 <div class="campo"><label>Título de Eleitor</label><input id="titulo"></div>
 <div class="campo"><label>Reservista</label><input id="reservista"></div>
 <div class="campo"><label>CNH</label><input id="cnh"></div>
-
 </div>
 
 <!-- CONTRATO -->
@@ -216,12 +201,11 @@ placeholder="Informações sobre os filhos...">
 <div class="campo"><label>Setor</label><input id="setor"></div>
 <div class="campo"><label>Salário Bruto</label><input type="number" step="0.01" id="salario"></div>
 
-<div class="campo"><label>Horário de Trabalho - Início</label><input type="time" id="hora_inicio"></div>
-<div class="campo"><label>Horário de Trabalho - Fim</label><input type="time" id="hora_fim"></div>
+<div class="campo"><label>Horário Trabalho - Início</label><input type="time" id="hora_inicio"></div>
+<div class="campo"><label>Horário Trabalho - Fim</label><input type="time" id="hora_fim"></div>
 
 <div class="campo"><label>Intervalo - Início</label><input type="time" id="intervalo_inicio"></div>
 <div class="campo"><label>Intervalo - Fim</label><input type="time" id="intervalo_fim"></div>
-
 </div>
 
 <!-- BANCO -->
@@ -232,7 +216,6 @@ placeholder="Informações sobre os filhos...">
 <div class="campo"><label>Agência</label><input id="agencia"></div>
 <div class="campo"><label>Conta</label><input id="conta"></div>
 <div class="campo"><label>Chave PIX</label><input id="pix"></div>
-
 </div>
 
 <!-- FOLHA -->
@@ -241,20 +224,20 @@ placeholder="Informações sobre os filhos...">
 
 <div class="campo">
 <label>Insalubridade</label>
-<select onchange="toggleJustificativa(this,'just_insalubridade')">
+<select onchange="toggleSimNao(this,'just_insalubridade')">
 <option>Não</option>
 <option>Sim</option>
 </select>
-<textarea id="just_insalubridade" class="justificativa" placeholder="Descreva a insalubridade..."></textarea>
+<textarea id="just_insalubridade" class="oculto"></textarea>
 </div>
 
 <div class="campo">
 <label>Periculosidade</label>
-<select onchange="toggleJustificativa(this,'just_periculosidade')">
+<select onchange="toggleSimNao(this,'just_periculosidade')">
 <option>Não</option>
 <option>Sim</option>
 </select>
-<textarea id="just_periculosidade" class="justificativa" placeholder="Descreva a periculosidade..."></textarea>
+<textarea id="just_periculosidade" class="oculto"></textarea>
 </div>
 
 <div class="campo">
@@ -284,10 +267,38 @@ placeholder="Informações sobre os filhos...">
 </div>
 
 <script>
-function toggleJustificativa(select, id){
-    const campo = document.getElementById(id)
-    campo.style.display = select.value === "Sim" ? "block" : "none"
+
+function toggleSimNao(select,id){
+document.getElementById(id).style.display =
+select.value === "Sim" ? "block" : "none"
 }
+
+function toggleDependentes(select){
+const qtd = document.getElementById("qtd_dependentes")
+const txt = document.getElementById("just_dependentes")
+
+if(select.value === "Sim"){
+qtd.style.display="block"
+txt.style.display="block"
+}else{
+qtd.style.display="none"
+txt.style.display="none"
+}
+}
+
+function toggleFilhos(select){
+const qtd = document.getElementById("qtd_filhos")
+const txt = document.getElementById("just_filhos")
+
+if(select.value === "Sim"){
+qtd.style.display="block"
+txt.style.display="block"
+}else{
+qtd.style.display="none"
+txt.style.display="none"
+}
+}
+
 </script>
 
 </body>
