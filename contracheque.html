@@ -7,38 +7,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+<script src="auth.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-<style>
-.contracheque{
-width:190mm;
-min-height:260mm;
-background:white;
-color:black;
-padding:15mm;
-font-size:12px;
-box-sizing:border-box;
-margin-bottom:10mm;
-font-family:Arial;
-}
-.linha{
-display:flex;
-justify-content:space-between;
-margin-bottom:4px;
-}
-.tabela{
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-}
-.tabela th{ background:#eee }
-.tabela td,.tabela th{
-border:1px solid black;
-padding:4px;
-text-align:center;
-}
-</style>
 </head>
 
 <body>
@@ -46,139 +17,221 @@ text-align:center;
 <div class="container">
 
 <h1>Gerar Contracheque</h1>
-<h3 id="nomeFuncionario"></h3>
+<h3 id="funcionarioNome"></h3>
 
-<label>Mês:</label>
+<label>Mês</label>
 <input type="number" id="mes">
 
-<label>Ano:</label>
+<label>Ano</label>
 <input type="number" id="ano">
 
-<label>Faltas injustificadas:</label>
-<input type="number" id="faltasInjust" value="0">
+<hr>
 
-<label>Dependentes IRRF:</label>
-<input type="number" id="dependentes" value="0">
+<h3>Vencimentos</h3>
+<input type="number" id="he50" placeholder="Horas extras 50%">
+<input type="number" id="he100" placeholder="Horas extras 100%">
+<input type="number" id="noturno" placeholder="Adicional noturno">
+<input type="number" id="insal" placeholder="Insalubridade">
+<input type="number" id="peric" placeholder="Periculosidade">
+<input type="number" id="bonus" placeholder="Bônus">
+
+<h3>Descontos</h3>
+<input type="number" id="faltas" placeholder="Faltas">
+<input type="number" id="vt" placeholder="Vale transporte">
+<input type="number" id="vr" placeholder="Vale refeição">
+<input type="number" id="pensao" placeholder="Pensão">
+<input type="number" id="outros" placeholder="Outros descontos">
+<input type="number" id="dependentes" placeholder="Dependentes IRRF">
 
 <br><br>
 
-<button type="button" onclick="calcular()">Calcular</button>
-<button type="button" onclick="gerarPDF()">Gerar PDF</button>
-<button type="button" onclick="voltar()">Voltar</button>
+<button onclick="calcular()">Calcular</button>
+<button onclick="salvar()">Salvar no Banco</button>
+<button onclick="gerarPDF()">Gerar PDF</button>
+<button onclick="location='dashboard.html'">Voltar</button>
 
 <hr>
-<div id="pdfArea"></div>
+<div id="resultado"></div>
 
 </div>
 
 <script>
 
-/* funcionário selecionado */
-const index = localStorage.getItem("funcionarioSelecionado")
-const funcionarios = JSON.parse(localStorage.getItem("funcionarios")) || []
-const func = funcionarios[index]
+protegerPagina()
 
-if(func){
-document.getElementById("nomeFuncionario").innerText = func.nome
+/* ============================= */
+/* PEGAR UID DO FUNCIONÁRIO */
+/* ============================= */
+
+const params = new URLSearchParams(window.location.search)
+const funcionarioUID = params.get("uid")
+
+if(!funcionarioUID){
+alert("Funcionário não informado")
+location="funcionarios.html"
 }
 
-/* INSS */
-function calcularINSS(s){
-if(s<=1412) return s*0.075
-if(s<=2666.68) return 1412*0.075+(s-1412)*0.09
-if(s<=4000.03) return 1412*0.075+1254.68*0.09+(s-2666.68)*0.12
-return 1412*0.075+1254.68*0.09+1333.35*0.12+(s-4000.03)*0.14
+let funcionario
+
+async function carregarFuncionario(){
+const {data,error} = await supabaseClient
+.from("funcionarios")
+.select("*")
+.eq("uid",funcionarioUID)
+.single()
+
+if(error){
+alert("Erro ao carregar funcionário")
+return
 }
 
-/* IRRF */
-function calcularIRRF(base,dep){
-base-=dep*189.59
+funcionario=data
+document.getElementById("funcionarioNome").innerText =
+funcionario.nome+" | CPF: "+funcionario.cpf
+}
+
+carregarFuncionario()
+
+/* ============================= */
+/* CÁLCULOS CLT */
+/* ============================= */
+
+function inssProgressivo(base){
+
+if(base<=1412) return base*0.075
+if(base<=2666.68) return 1412*0.075+(base-1412)*0.09
+if(base<=4000.03) return 1412*0.075+1254.68*0.09+(base-2666.68)*0.12
+return 1412*0.075+1254.68*0.09+1333.35*0.12+(base-4000.03)*0.14
+}
+
+function irrfProgressivo(base,dep){
+base -= dep*189.59
+
 if(base<=2112) return 0
-if(base<=2826.65) return base*0.075-158.40
-if(base<=3751.05) return base*0.15-370.40
+if(base<=2826.65) return base*0.075-158.4
+if(base<=3751.05) return base*0.15-370.4
 if(base<=4664.68) return base*0.225-651.73
 return base*0.275-884.96
 }
 
-/* calcular */
+/* ============================= */
+/* RESULTADO GLOBAL */
+/* ============================= */
+
+let calculoFinal={}
+
 function calcular(){
 
-const mes=document.getElementById("mes").value
-const ano=document.getElementById("ano").value
+const salario = Number(funcionario.salario||0)
+const faltas = Number(document.getElementById("faltas").value||0)
+const dep = Number(document.getElementById("dependentes").value||0)
 
-if(!mes||!ano){
-alert("Informe mês e ano")
+const descFaltas = (salario/30)*faltas
+
+const vencimentos =
+salario+
+Number(he50.value||0)+
+Number(he100.value||0)+
+Number(noturno.value||0)+
+Number(insal.value||0)+
+Number(peric.value||0)+
+Number(bonus.value||0)
+
+const baseINSS = vencimentos-descFaltas
+const inss = inssProgressivo(baseINSS)
+
+const baseIRRF = baseINSS-inss
+const irrf = irrfProgressivo(baseIRRF,dep)
+
+const fgts = baseINSS*0.08
+
+const descontos =
+descFaltas+
+Number(vt.value||0)+
+Number(vr.value||0)+
+Number(pensao.value||0)+
+Number(outros.value||0)+
+inss+irrf
+
+const liquido = vencimentos-descontos
+
+calculoFinal={
+salario,
+descFaltas,
+baseINSS,
+baseIRRF,
+fgts,
+inss,
+irrf,
+liquido
+}
+
+resultado.innerHTML=
+"<h3>Líquido: R$ "+liquido.toFixed(2)+"</h3>"
+}
+
+/* ============================= */
+/* SALVAR NO BANCO */
+/* ============================= */
+
+async function salvar(){
+
+if(!calculoFinal.liquido){
+alert("Calcule antes")
 return
 }
 
-const salario=Number(func.salario||0)
-const faltas=Number(document.getElementById("faltasInjust").value)
-const dep=Number(document.getElementById("dependentes").value)
+const {error} = await supabaseClient
+.from("contracheques")
+.insert([{
+funcionario_uid: funcionarioUID,
+competencia_mes: mes.value,
+competencia_ano: ano.value,
 
-const desc=(salario/30)*faltas
-const rem=salario-desc
-const inss=calcularINSS(rem)
-const irrf=calcularIRRF(rem-inss,dep)
-const fgts=rem*0.08
-const liq=rem-inss-irrf
+salario_base: calculoFinal.salario,
+horas_extras_50: he50.value||0,
+horas_extras_100: he100.value||0,
+adicional_noturno: noturno.value||0,
+insalubridade: insal.value||0,
+periculosidade: peric.value||0,
+bonus: bonus.value||0,
 
-let html=""
+faltas: faltas.value||0,
+desconto_faltas: calculoFinal.descFaltas,
+vale_transporte: vt.value||0,
+vale_refeicao: vr.value||0,
+pensao: pensao.value||0,
+outros_descontos: outros.value||0,
 
-for(let i=0;i<2;i++){
-html+=`
-<div class="contracheque">
-<div style="text-align:center;">
-<b>FACILITE GESTÃO EMPRESARIAL LTDA</b><br>
-CNPJ 00.000.000/0001-00
-</div>
-<hr>
-<div class="linha">
-<div>Funcionário: ${func.nome}</div>
-<div>Matrícula: ${index}</div>
-</div>
-<div class="linha">
-<div>CPF: ${func.cpf}</div>
-<div>Competência: ${mes}/${ano}</div>
-</div>
-<table class="tabela">
-<tr><th>Cód</th><th>Descrição</th><th>Venc</th><th>Desc</th></tr>
-<tr><td>001</td><td>Salário</td><td>${salario.toFixed(2)}</td><td></td></tr>
-<tr><td>101</td><td>Faltas</td><td></td><td>${desc.toFixed(2)}</td></tr>
-<tr><td>201</td><td>INSS</td><td></td><td>${inss.toFixed(2)}</td></tr>
-<tr><td>202</td><td>IRRF</td><td></td><td>${irrf.toFixed(2)}</td></tr>
-</table>
-<div class="linha">
-<div>FGTS: ${fgts.toFixed(2)}</div>
-<div><b>Líquido: ${liq.toFixed(2)}</b></div>
-</div>
-<br><br>
-_____________________________<br>
-Assinatura
-</div>`
+base_inss: calculoFinal.baseINSS,
+base_irrf: calculoFinal.baseIRRF,
+base_fgts: calculoFinal.baseINSS,
+
+inss: calculoFinal.inss,
+irrf: calculoFinal.irrf,
+fgts: calculoFinal.fgts,
+
+salario_liquido: calculoFinal.liquido,
+dependentes: dependentes.value||0
+}])
+
+if(error){
+alert("Erro ao salvar")
+console.log(error)
+return
 }
 
-document.getElementById("pdfArea").innerHTML=html
+alert("Contracheque salvo com sucesso")
 }
+
+/* ============================= */
+/* PDF */
+/* ============================= */
 
 function gerarPDF(){
-const area=document.getElementById("pdfArea")
-if(area.innerHTML===""){
-alert("Calcule primeiro")
-return
-}
-html2pdf().from(area).save("contracheque.pdf")
-}
-
-function voltar(){
-location="dashboard.html"
+html2pdf().from(resultado).save("contracheque.pdf")
 }
 
 </script>
-
-<script src="auth.js"></script>
-<script>
-window.addEventListener("DOMContentLoaded", protegerPagina)
-</script>
-
 </body>
 </html>
