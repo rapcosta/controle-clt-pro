@@ -1,12 +1,12 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>Gerar Contracheque</title>
 <link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -22,23 +22,17 @@ box-sizing:border-box;
 margin-bottom:10mm;
 font-family:Arial;
 }
-
 .linha{
 display:flex;
 justify-content:space-between;
 margin-bottom:4px;
 }
-
 .tabela{
 width:100%;
 border-collapse:collapse;
 margin-top:10px;
 }
-
-.tabela th{
-background:#eee;
-}
-
+.tabela th{ background:#eee }
 .tabela td,.tabela th{
 border:1px solid black;
 padding:4px;
@@ -79,17 +73,14 @@ text-align:center;
 
 <script>
 
-/* login */
-if(localStorage.getItem("logado")!=="sim"){
-window.location="login.html"
-}
-
-/* funcionário */
+/* funcionário selecionado */
 const index = localStorage.getItem("funcionarioSelecionado")
 const funcionarios = JSON.parse(localStorage.getItem("funcionarios")) || []
 const func = funcionarios[index]
 
+if(func){
 document.getElementById("nomeFuncionario").innerText = func.nome
+}
 
 /* INSS */
 function calcularINSS(s){
@@ -109,7 +100,7 @@ if(base<=4664.68) return base*0.225-651.73
 return base*0.275-884.96
 }
 
-/* CALCULAR */
+/* calcular */
 function calcular(){
 
 const mes=document.getElementById("mes").value
@@ -133,29 +124,22 @@ const liq=rem-inss-irrf
 
 let html=""
 
-/* duas vias */
 for(let i=0;i<2;i++){
-
 html+=`
 <div class="contracheque">
-
 <div style="text-align:center;">
 <b>FACILITE GESTÃO EMPRESARIAL LTDA</b><br>
 CNPJ 00.000.000/0001-00
 </div>
-
 <hr>
-
 <div class="linha">
 <div>Funcionário: ${func.nome}</div>
 <div>Matrícula: ${index}</div>
 </div>
-
 <div class="linha">
 <div>CPF: ${func.cpf}</div>
 <div>Competência: ${mes}/${ano}</div>
 </div>
-
 <table class="tabela">
 <tr><th>Cód</th><th>Descrição</th><th>Venc</th><th>Desc</th></tr>
 <tr><td>001</td><td>Salário</td><td>${salario.toFixed(2)}</td><td></td></tr>
@@ -163,25 +147,19 @@ CNPJ 00.000.000/0001-00
 <tr><td>201</td><td>INSS</td><td></td><td>${inss.toFixed(2)}</td></tr>
 <tr><td>202</td><td>IRRF</td><td></td><td>${irrf.toFixed(2)}</td></tr>
 </table>
-
 <div class="linha">
 <div>FGTS: ${fgts.toFixed(2)}</div>
 <div><b>Líquido: ${liq.toFixed(2)}</b></div>
 </div>
-
 <br><br>
 _____________________________<br>
 Assinatura
-
-</div>
-`
+</div>`
 }
 
 document.getElementById("pdfArea").innerHTML=html
-
 }
 
-/* PDF */
 function gerarPDF(){
 const area=document.getElementById("pdfArea")
 if(area.innerHTML===""){
@@ -192,17 +170,15 @@ html2pdf().from(area).save("contracheque.pdf")
 }
 
 function voltar(){
-window.location="dashboard.html"
+location="dashboard.html"
 }
 
 </script>
+
 <script src="auth.js"></script>
 <script>
-window.addEventListener("DOMContentLoaded", () => {
-protegerPagina()
-})
+window.addEventListener("DOMContentLoaded", protegerPagina)
 </script>
-
 
 </body>
 </html>
