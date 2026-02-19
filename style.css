@@ -6,8 +6,10 @@ margin:0;
 }
 
 .container{
-    width:calc(100% - 80px);
-    margin:40px;
+    width:100%;
+    max-width:none;        /* remove limite de largura */
+    padding:40px 60px;     /* respiro lateral */
+    margin:0;
 }
 
 
@@ -202,25 +204,33 @@ font-size:14px;
     margin-bottom:18px;
 }
 
-.campo label{
-    display:block;
+label{
+    font-size:18px;
+    font-weight:600;
     margin-bottom:6px;
-    font-weight:bold;
+    display:block;
 }
 
-.campo input,
-.campo select,
-.campo textarea{
+
+input,
+select,
+textarea{
     width:100%;
-    padding:10px;
-    border-radius:6px;
-    border:none;
-    font-size:14px;
+    padding:14px 16px;
+    font-size:16px;
+    border-radius:8px;
 }
+
 
 textarea{
     min-height:80px;
 }
+.card h2{
+    font-size:24px;
+    margin-bottom:20px;
+}
+
+
 
 /* campos que aparecem quando SIM */
 .condicional{
