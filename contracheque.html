@@ -11,32 +11,99 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
+
+body{
+    background:#000;
+    color:#fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* CONTAINER CENTRAL */
 .container{
-max-width:600px;
-margin:auto;
-text-align:center;
+    width:100%;
+    max-width:520px;
+    margin:40px auto;
+    padding:30px;
+    background:rgba(20,20,20,0.9);
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.6);
+    text-align:center;
 }
 
-input{
-width:100%;
-padding:10px;
-margin:5px 0;
-border-radius:6px;
-border:none;
+/* TITULOS */
+h1{
+    margin-bottom:10px;
 }
 
+h3{
+    margin-top:25px;
+    margin-bottom:10px;
+}
+
+/* LINHA SEPARADORA */
+hr{
+    margin:20px 0;
+    border:1px solid #444;
+}
+
+/* GRUPOS DE CAMPOS */
+.grupo{
+    margin-bottom:18px;
+    text-align:left;
+}
+
+/* LABEL */
 label{
-display:block;
-margin-top:10px;
-font-weight:bold;
+    display:block;
+    margin-bottom:5px;
+    font-weight:bold;
+    font-size:14px;
 }
 
-.resumo{
-margin-top:20px;
-padding:15px;
-background:#111;
-border-radius:8px;
+/* INPUT */
+input{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    font-size:15px;
+    background:#eee;
 }
+
+/* BOTÕES */
+.botoes{
+    margin-top:25px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:15px;
+    background:#e0e0e0;
+}
+
+button:hover{
+    background:#cfcfcf;
+}
+
+/* RESUMO */
+.resumo{
+    margin-top:25px;
+    padding:20px;
+    background:#111;
+    border-radius:10px;
+    text-align:left;
+}
+
+.resumo p{
+    margin:6px 0;
+}
+
 </style>
 </head>
 
