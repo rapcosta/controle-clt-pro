@@ -6,218 +6,267 @@
 
 <link rel="stylesheet" href="style.css">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
 <style>
+body{
+    background:#0b0b0b;
+    color:#fff;
+    font-family:Arial;
+}
+
 .container{
-max-width:1000px;
-margin:auto;
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
+    width:900px;
+    margin:auto;
+    padding:20px;
 }
-input,select{
-padding:8px;
-border-radius:6px;
-border:none;
+
+h1{
+    text-align:center;
 }
-.full{ grid-column:span 2 }
-h2{ grid-column:span 2; margin-top:20px }
+
+.secao{
+    background:#151515;
+    padding:20px;
+    margin-top:20px;
+    border-radius:8px;
+}
+
+.secao h2{
+    margin-bottom:15px;
+    border-bottom:1px solid #333;
+    padding-bottom:5px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+label{
+    font-size:13px;
+    color:#bbb;
+}
+
+input, select{
+    width:100%;
+    padding:8px;
+    border-radius:6px;
+    border:none;
+    background:#e6e6e6;
+}
+
+.linha-3{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:12px;
+}
+
+.linha-4{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr 1fr;
+    gap:12px;
+}
+
+.botoes{
+    text-align:center;
+    margin-top:30px;
+}
+
+button{
+    padding:10px 20px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    margin:5px;
+}
 </style>
 </head>
 
 <body>
 
-<button onclick="logout()">Sair</button>
-
-<h1 id="titulo">Cadastro de Funcionário</h1>
-
 <div class="container">
 
-<h2>Dados Pessoais</h2>
-<input id="nome" placeholder="Nome completo" class="full">
-<input id="email" placeholder="Email">
-<input id="celular" placeholder="Celular">
-<input id="nascimento" type="date">
-<input id="genero" placeholder="Gênero">
-<input id="sangue" placeholder="Tipo sanguíneo">
+<h1>Cadastro de Funcionário</h1>
 
-<h2>Documentos</h2>
-<input id="cpf" placeholder="CPF">
-<input id="rg" placeholder="RG">
-<input id="ctps" placeholder="CTPS">
-<input id="nis" placeholder="NIS">
+<form id="formFuncionario">
 
-<h2>Dados Profissionais</h2>
-<input id="funcao" placeholder="Função">
-<input id="cbo" placeholder="CBO">
-<input id="categoria" placeholder="Categoria código">
-<input id="matricula" placeholder="Matrícula">
-<input id="entrada" type="date">
-<input id="horario" placeholder="Horário de trabalho">
-<input id="atividades" placeholder="Atividades" class="full">
-
+<!-- EMPRESA -->
+<div class="secao">
 <h2>Empresa</h2>
-<input id="empresa" placeholder="Empresa">
-<input id="cnpj" placeholder="CNPJ">
+<div class="grid">
+<div>
+<label>Nome da Empresa</label>
+<input id="empresa_nome">
+</div>
 
-<select id="unidade" class="full">
-<option value="">Selecionar unidade</option>
-<option>Sabara</option>
-<option>Cruzeiro da Fortaleza</option>
-<option>Ocidental</option>
-<option>Aguas Lindas</option>
-<option>Guimarania</option>
+<div>
+<label>CNPJ</label>
+<input id="empresa_cnpj">
+</div>
+</div>
+</div>
+
+<!-- DADOS PESSOAIS -->
+<div class="secao">
+<h2>Dados Pessoais</h2>
+
+<div class="grid">
+<div><label>Nome Completo</label><input id="nome"></div>
+<div><label>Data de Nascimento</label><input type="date" id="nascimento"></div>
+<div><label>Naturalidade</label><input id="naturalidade"></div>
+<div><label>Nacionalidade</label><input id="nacionalidade"></div>
+<div><label>Estado Civil</label><input id="estado_civil"></div>
+<div><label>Grau de Instrução</label><input id="instrucao"></div>
+<div><label>Raça / Cor</label><input id="raca"></div>
+
+<div>
+<label>Deficiência</label>
+<select id="deficiencia">
+<option>Não</option>
+<option>Sim</option>
 </select>
+</div>
 
-<h2>Dados Bancários</h2>
-<input id="banco" placeholder="Banco">
-<input id="agencia" placeholder="Agência">
-<input id="conta" placeholder="Conta">
-<input id="pix" placeholder="Chave PIX" class="full">
+<div>
+<label>Dependentes</label>
+<input type="number" id="dependentes">
+</div>
 
-<button onclick="salvar()">Salvar</button>
-<button onclick="voltar()">Cancelar</button>
+<div>
+<label>Filhos (Salário Família)</label>
+<select id="filhos_salario">
+<option>Não</option>
+<option>Sim</option>
+</select>
+</div>
+
+<div><label>Nome do Pai</label><input id="nome_pai"></div>
+<div><label>Nome da Mãe</label><input id="nome_mae"></div>
+
+</div>
+</div>
+
+<!-- ENDEREÇO -->
+<div class="secao">
+<h2>Endereço e Contato</h2>
+
+<div class="grid">
+<div><label>Endereço</label><input id="endereco"></div>
+<div><label>Bairro</label><input id="bairro"></div>
+<div><label>Cidade</label><input id="cidade"></div>
+<div><label>UF</label><input id="uf"></div>
+<div><label>CEP</label><input id="cep"></div>
+<div><label>Telefone</label><input id="telefone"></div>
+<div><label>Celular</label><input id="celular"></div>
+<div><label>Email</label><input id="email"></div>
+</div>
+</div>
+
+<!-- DOCUMENTOS -->
+<div class="secao">
+<h2>Documentação</h2>
+
+<div class="grid">
+<div><label>CPF</label><input id="cpf"></div>
+<div><label>RG</label><input id="rg"></div>
+<div><label>PIS / PASEP</label><input id="pis"></div>
+<div><label>CTPS</label><input id="ctps"></div>
+<div><label>Título Eleitor</label><input id="titulo"></div>
+<div><label>Reservista</label><input id="reservista"></div>
+<div><label>CNH</label><input id="cnh"></div>
+</div>
+</div>
+
+<!-- CONTRATO -->
+<div class="secao">
+<h2>Dados Contratuais</h2>
+
+<div class="grid">
+<div><label>Data de Admissão</label><input type="date" id="admissao"></div>
+<div><label>Função</label><input id="funcao"></div>
+<div><label>CBO</label><input id="cbo"></div>
+<div><label>Setor</label><input id="setor"></div>
+<div><label>Salário Bruto</label><input type="number" step="0.01" id="salario"></div>
+</div>
+
+<br>
+
+<label>Horário de Trabalho</label>
+<div class="linha-4">
+<input type="time" id="hora_inicio">
+<input type="time" id="hora_fim">
+</div>
+
+<br>
+
+<label>Intervalo</label>
+<div class="linha-4">
+<input type="time" id="intervalo_inicio">
+<input type="time" id="intervalo_fim">
+</div>
 
 </div>
 
-<script>
+<!-- BANCO -->
+<div class="secao">
+<h2>Dados Bancários</h2>
 
-/* ================= LOGIN ================= */
+<div class="grid">
+<div><label>Banco</label><input id="banco"></div>
+<div><label>Agência</label><input id="agencia"></div>
+<div><label>Conta</label><input id="conta"></div>
+<div><label>Chave PIX</label><input id="pix"></div>
+</div>
+</div>
 
-async function verificarLogin(){
-const { data } = await supabaseClient.auth.getSession()
-if(!data.session){
-location="login.html"
-}
-}
-verificarLogin()
+<!-- FOLHA -->
+<div class="secao">
+<h2>Dados de Folha</h2>
 
-async function logout(){
-await supabaseClient.auth.signOut()
-location="login.html"
-}
+<div class="grid">
 
-/* ================= EDIÇÃO ================= */
+<div>
+<label>Insalubridade</label>
+<select id="insalubridade">
+<option>Não</option>
+<option>Sim</option>
+</select>
+</div>
 
-let uidEditar = localStorage.getItem("funcionarioEditando")
+<div>
+<label>Periculosidade</label>
+<select id="periculosidade">
+<option>Não</option>
+<option>Sim</option>
+</select>
+</div>
 
-if(uidEditar){
-document.getElementById("titulo").innerText="Editar Funcionário"
-carregar()
-}
+<div>
+<label>CLT</label>
+<select id="clt">
+<option>Sim</option>
+<option>Não</option>
+</select>
+</div>
 
-async function carregar(){
+<div>
+<label>Funcionário Ativo</label>
+<select id="ativo">
+<option>Sim</option>
+<option>Não</option>
+</select>
+</div>
 
-const { data, error } = await supabaseClient
-.from("funcionarios")
-.select("*")
-.eq("uid", uidEditar)
-.single()
+</div>
+</div>
 
-if(error){
-alert("Erro ao carregar dados:\n"+error.message)
-return
-}
+<div class="botoes">
+<button type="submit">Salvar Funcionário</button>
+<button type="button" onclick="history.back()">Cancelar</button>
+</div>
 
-Object.keys(data).forEach(campo=>{
-const el=document.getElementById(campo)
-if(el) el.value=data[campo]
-})
-}
+</form>
+</div>
 
-/* ================= MENSAGEM ERRO ================= */
-
-function mensagemErro(error){
-
-let msg = error.message || "Erro desconhecido"
-
-if(msg.includes("invalid input syntax for type date"))
-msg="Existe campo de DATA vazio ou inválido"
-
-if(msg.includes("null value in column"))
-msg="Existe campo obrigatório não preenchido"
-
-if(msg.includes("duplicate key"))
-msg="Registro duplicado no banco"
-
-return msg
-}
-
-/* ================= SALVAR ================= */
-
-async function salvar(){
-
-const funcionario={
-nome:document.getElementById("nome").value,
-email:document.getElementById("email").value,
-celular:document.getElementById("celular").value,
-nascimento:document.getElementById("nascimento").value,
-genero:document.getElementById("genero").value,
-sangue:document.getElementById("sangue").value,
-cpf:document.getElementById("cpf").value,
-rg:document.getElementById("rg").value,
-ctps:document.getElementById("ctps").value,
-nis:document.getElementById("nis").value,
-funcao:document.getElementById("funcao").value,
-cbo:document.getElementById("cbo").value,
-categoria:document.getElementById("categoria").value,
-matricula:document.getElementById("matricula").value,
-entrada:document.getElementById("entrada").value,
-horario:document.getElementById("horario").value,
-atividades:document.getElementById("atividades").value,
-empresa:document.getElementById("empresa").value,
-cnpj:document.getElementById("cnpj").value,
-unidade:document.getElementById("unidade").value,
-banco:document.getElementById("banco").value,
-agencia:document.getElementById("agencia").value,
-conta:document.getElementById("conta").value,
-pix:document.getElementById("pix").value
-}
-
-/* EDITAR */
-
-if(uidEditar){
-
-const { error } = await supabaseClient
-.from("funcionarios")
-.update(funcionario)
-.eq("uid", uidEditar)
-
-if(error){
-alert("Erro ao atualizar:\n\n"+mensagemErro(error))
-console.error(error)
-return
-}
-
-localStorage.removeItem("funcionarioEditando")
-alert("Funcionário atualizado")
-location="funcionarios.html"
-return
-}
-
-/* NOVO */
-
-const { error } = await supabaseClient
-.from("funcionarios")
-.insert([funcionario])
-
-if(error){
-alert("Erro ao cadastrar:\n\n"+mensagemErro(error))
-console.error(error)
-return
-}
-
-alert("Funcionário cadastrado")
-location="funcionarios.html"
-}
-
-function voltar(){
-localStorage.removeItem("funcionarioEditando")
-location="funcionarios.html"
-}
-
-</script>
 </body>
 </html>
