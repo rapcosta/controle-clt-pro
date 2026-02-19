@@ -125,9 +125,20 @@ button{
 <textarea id="just_deficiencia" class="justificativa" placeholder="Descreva a deficiência..."></textarea>
 </div>
 
+
 <div class="campo">
-<label>Dependentes (Quantidade)</label>
-<input type="number" id="dependentes">
+<label>Dependentes</label>
+<select onchange="toggleJustificativa(this,'just_dependentes')">
+<option>Não</option>
+<option>Sim</option>
+</select>
+
+<textarea id="just_dependentes"
+class="justificativa"
+placeholder="Informe quantidade, nomes ou detalhes dos dependentes...">
+</textarea>
+</div>
+
 </div>
 
 <!-- FILHOS -->
