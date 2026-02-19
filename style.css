@@ -6,10 +6,10 @@ margin:0;
 }
 
 .container{
-max-width:400px;
-margin:120px auto;
-text-align:center;
+    width:calc(100% - 80px);
+    margin:40px;
 }
+
 
 header{
 display:flex;
