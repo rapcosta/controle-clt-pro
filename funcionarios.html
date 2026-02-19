@@ -86,6 +86,7 @@ tbody.innerHTML += `
 <button onclick="ver('${f.uid}')">Ver</button>
 <button onclick="editar('${f.uid}')">Editar</button>
 <button onclick="excluir('${f.uid}')">Excluir</button>
+<button onclick="gerarContracheque('${f.uid}')">Contracheque</button>
 </td>
 </tr>
 `
@@ -145,6 +146,18 @@ alert("Excluído com sucesso")
 carregarFuncionarios()
 }
 
+/* ========================= */
+/* GERAR CONTRACHEQUE */
+/* ========================= */
+
+function gerarContracheque(uid){
+location = "contracheque.html?uid=" + uid
+}
+
+/* ========================= */
+/* VOLTAR */
+/* ========================= */
+
 function voltar(){
 location="dashboard.html"
 }
@@ -160,11 +173,8 @@ carregarFuncionarios()
 <!-- PROTEÇÃO LOGIN -->
 <script src="auth.js"></script>
 <script>
-window.addEventListener("DOMContentLoaded", () => {
-protegerPagina()
-})
+window.addEventListener("DOMContentLoaded", protegerPagina)
 </script>
-
 
 </body>
 </html>
