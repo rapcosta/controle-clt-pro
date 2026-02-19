@@ -268,10 +268,18 @@ placeholder="Informações dos filhos">
 
 <script>
 
-function toggleSimNao(select,id){
-document.getElementById(id).style.display =
-select.value === "Sim" ? "block" : "none"
+function popularQuantidade(id){
+const select = document.getElementById(id)
+for(let i=0;i<=50;i++){
+const opt = document.createElement("option")
+opt.value=i
+opt.textContent=i
+select.appendChild(opt)
 }
+}
+
+popularQuantidade("qtd_dependentes")
+popularQuantidade("qtd_filhos")
 
 function toggleDependentes(select){
 const qtd = document.getElementById("qtd_dependentes")
