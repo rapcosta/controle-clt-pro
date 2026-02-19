@@ -15,8 +15,10 @@ body{
 }
 
 .container{
-    width:600px;
+    width:700px;
+    margin-left:40px;
 }
+
 
 .secao{
     background:#151515;
@@ -123,17 +125,15 @@ button{
 <!-- DEPENDENTES -->
 <div class="campo">
 <label>Dependentes</label>
+
 <select onchange="toggleDependentes(this)">
 <option>Não</option>
 <option>Sim</option>
 </select>
 
-<input type="number"
-id="qtd_dependentes"
-class="oculto"
-min="0"
-max="50"
-placeholder="Quantidade (0 a 50)">
+<select id="qtd_dependentes" class="oculto">
+<option value="">Quantidade</option>
+</select>
 
 <textarea id="just_dependentes"
 class="oculto"
@@ -141,26 +141,26 @@ placeholder="Informações dos dependentes">
 </textarea>
 </div>
 
+
 <!-- FILHOS -->
 <div class="campo">
 <label>Filhos (Salário Família)</label>
+
 <select onchange="toggleFilhos(this)">
 <option>Não</option>
 <option>Sim</option>
 </select>
 
-<input type="number"
-id="qtd_filhos"
-class="oculto"
-min="0"
-max="50"
-placeholder="Quantidade (0 a 50)">
+<select id="qtd_filhos" class="oculto">
+<option value="">Quantidade</option>
+</select>
 
 <textarea id="just_filhos"
 class="oculto"
 placeholder="Informações dos filhos">
 </textarea>
 </div>
+
 
 </div>
 
