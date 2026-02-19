@@ -8,101 +8,117 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-<script src="auth.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-
-.secao{
-margin-top:20px;
-padding:15px;
-background:#1e1e1e;
-border-radius:8px;
+.container{
+max-width:600px;
+margin:auto;
+text-align:center;
 }
 
 input{
-margin-bottom:8px;
+width:100%;
+padding:10px;
+margin:5px 0;
+border-radius:6px;
+border:none;
 }
 
-.contrachequePDF{
-background:white;
-color:black;
-padding:20px;
-width:800px;
-margin-top:30px;
+label{
+display:block;
+margin-top:10px;
+font-weight:bold;
 }
 
+.resumo{
+margin-top:20px;
+padding:15px;
+background:#111;
+border-radius:8px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="container" id="area-contracheque">
 
 <h1>Gerar Contracheque</h1>
+
 <h3 id="nomeFuncionario"></h3>
-
-<label>Mês da competência</label>
-<input type="number" id="mes">
-
-<label>Ano da competência</label>
-<input type="number" id="ano">
-
-<div class="secao">
-<h3>Vencimentos (VALORES EM R$)</h3>
-
-<input type="number" id="he50" placeholder="Horas extras 50% (R$)">
-<input type="number" id="he100" placeholder="Horas extras 100% (R$)">
-<input type="number" id="noturno" placeholder="Adicional noturno (R$)">
-<input type="number" id="insal" placeholder="Insalubridade (R$)">
-<input type="number" id="peric" placeholder="Periculosidade (R$)">
-<input type="number" id="bonus" placeholder="Bônus / Comissão (R$)">
-</div>
-
-<div class="secao">
-<h3>Descontos</h3>
-
-<input type="number" id="faltas" placeholder="Faltas injustificadas (DIAS)">
-<input type="number" id="dependentes" placeholder="Dependentes IRRF (QTDE)">
-
-<input type="number" id="vt" placeholder="Vale transporte (R$)">
-<input type="number" id="vr" placeholder="Vale refeição (R$)">
-<input type="number" id="pensao" placeholder="Pensão alimentícia (R$)">
-<input type="number" id="outros" placeholder="Outros descontos (R$)">
-</div>
-
-<br>
-
-<button onclick="calcular()">Calcular</button>
-<button onclick="salvar()">Salvar no banco</button>
-<button onclick="gerarPDF()">Gerar PDF</button>
-<button onclick="location='dashboard.html'">Voltar</button>
 
 <hr>
 
-<div id="resumo"></div>
+<label>Mês</label>
+<input id="mes" value="01">
 
-<div id="areaPDF"></div>
+<label>Ano</label>
+<input id="ano" value="2026">
+
+<hr>
+
+<h3>Vencimentos</h3>
+
+<label>Salário Base (R$)</label>
+<input id="salario_base">
+
+<label>Horas Extras (R$)</label>
+<input id="horas_extras" value="0">
+
+<label>Adicional Noturno (R$)</label>
+<input id="noturno" value="0">
+
+<label>Insalubridade (R$)</label>
+<input id="insalubridade" value="0">
+
+<hr>
+
+<h3>Descontos</h3>
+
+<label>Faltas (dias)</label>
+<input id="faltas" value="0">
+
+<label>Dependentes IRRF</label>
+<input id="dependentes" value="0">
+
+<hr>
+
+<button onclick="calcular()">Calcular</button>
+<button onclick="gerarPDF()">Gerar PDF</button>
+<button onclick="voltar()">Voltar</button>
+
+<div class="resumo">
+<h3>Resumo do cálculo</h3>
+
+<p>Salário Base: R$ <span id="r_salario">0</span></p>
+<p>Total Vencimentos: R$ <span id="r_vencimentos">0</span></p>
+<p>INSS: R$ <span id="r_inss">0</span></p>
+<p>FGTS: R$ <span id="r_fgts">0</span></p>
+<p>Líquido: R$ <span id="r_liquido">0</span></p>
+</div>
 
 </div>
 
 <script>
 
-protegerPagina()
+/* ============================= */
+/* PEGAR UID */
+/* ============================= */
 
-const params=new URLSearchParams(window.location.search)
-const uid=params.get("uid")
+const params = new URLSearchParams(window.location.search)
+const uid = params.get("uid")
 
-let funcionario
-let resultadoFinal=null
+/* ============================= */
+/* CARREGAR FUNCIONARIO */
+/* ============================= */
 
 async function carregarFuncionario(){
 
-const {data,error}=await supabaseClient
+const {data,error} = await supabaseClient
 .from("funcionarios")
 .select("*")
-.eq("uid",uid)
+.eq("uid", uid)
 .single()
 
 if(error){
@@ -110,136 +126,77 @@ alert("Erro ao carregar funcionário")
 return
 }
 
-funcionario=data
-nomeFuncionario.innerText=data.nome+" | CPF "+data.cpf
+document.getElementById("nomeFuncionario").innerText =
+data.nome + " | CPF: " + data.cpf
+
+document.getElementById("salario_base").value = data.salario || 0
+
+calcular()
+
 }
 
 carregarFuncionario()
 
-function inss(base){
-if(base<=1412) return base*0.075
-if(base<=2666.68) return 1412*0.075+(base-1412)*0.09
-if(base<=4000.03) return 1412*0.075+1254.68*0.09+(base-2666.68)*0.12
-return 1412*0.075+1254.68*0.09+1333.35*0.12+(base-4000.03)*0.14
-}
-
-function irrf(base,dep){
-base-=dep*189.59
-if(base<=2112) return 0
-if(base<=2826.65) return base*0.075-158.4
-if(base<=3751.05) return base*0.15-370.4
-if(base<=4664.68) return base*0.225-651.73
-return base*0.275-884.96
-}
+/* ============================= */
+/* CALCULO CLT BASICO */
+/* ============================= */
 
 function calcular(){
 
-const salario=Number(funcionario.salario||0)
-const faltasDias=Number(faltas.value||0)
-const depend=Number(dependentes.value||0)
+let salario = Number(document.getElementById("salario_base").value || 0)
+let extras = Number(document.getElementById("horas_extras").value || 0)
+let noturno = Number(document.getElementById("noturno").value || 0)
+let insal = Number(document.getElementById("insalubridade").value || 0)
+let faltas = Number(document.getElementById("faltas").value || 0)
 
-const descontoFaltas=(salario/30)*faltasDias
+let desconto_faltas = (salario / 30) * faltas
 
-const vencimentos=
-salario+
-Number(he50.value||0)+
-Number(he100.value||0)+
-Number(noturno.value||0)+
-Number(insal.value||0)+
-Number(peric.value||0)+
-Number(bonus.value||0)
+let total_vencimentos = salario + extras + noturno + insal
 
-const baseINSS=vencimentos-descontoFaltas
-const valorINSS=inss(baseINSS)
+/* INSS aproximado */
+let inss = total_vencimentos * 0.08
 
-const baseIRRF=baseINSS-valorINSS
-const valorIRRF=irrf(baseIRRF,depend)
+/* FGTS */
+let fgts = total_vencimentos * 0.08
 
-const fgts=baseINSS*0.08
+let liquido = total_vencimentos - inss - desconto_faltas
 
-const descontos=
-descontoFaltas+
-valorINSS+
-valorIRRF+
-Number(vt.value||0)+
-Number(vr.value||0)+
-Number(pensao.value||0)+
-Number(outros.value||0)
+document.getElementById("r_salario").innerText = salario.toFixed(2)
+document.getElementById("r_vencimentos").innerText = total_vencimentos.toFixed(2)
+document.getElementById("r_inss").innerText = inss.toFixed(2)
+document.getElementById("r_fgts").innerText = fgts.toFixed(2)
+document.getElementById("r_liquido").innerText = liquido.toFixed(2)
 
-const liquido=vencimentos-descontos
-
-resultadoFinal={
-salario,
-vencimentos,
-descontoFaltas,
-valorINSS,
-valorIRRF,
-fgts,
-liquido
 }
 
-resumo.innerHTML=`
-<h3>Resumo do cálculo</h3>
-Salário base: R$ ${salario.toFixed(2)}<br>
-Total vencimentos: R$ ${vencimentos.toFixed(2)}<br>
-INSS: R$ ${valorINSS.toFixed(2)}<br>
-IRRF: R$ ${valorIRRF.toFixed(2)}<br>
-FGTS: R$ ${fgts.toFixed(2)}<br>
-<h2>Líquido: R$ ${liquido.toFixed(2)}</h2>
-`
-
-areaPDF.innerHTML=`
-<div class="contrachequePDF">
-<h2>CONTRACHEQUE</h2>
-Funcionário: ${funcionario.nome}<br>
-CPF: ${funcionario.cpf}<br>
-Competência: ${mes.value}/${ano.value}<br>
-<hr>
-Salário base: R$ ${salario.toFixed(2)}<br>
-Total vencimentos: R$ ${vencimentos.toFixed(2)}<br>
-INSS: R$ ${valorINSS.toFixed(2)}<br>
-IRRF: R$ ${valorIRRF.toFixed(2)}<br>
-FGTS: R$ ${fgts.toFixed(2)}<br>
-<hr>
-<b>Líquido: R$ ${liquido.toFixed(2)}</b>
-</div>
-`
-}
-
-async function salvar(){
-
-if(!resultadoFinal){
-alert("Calcule primeiro")
-return
-}
-
-await supabaseClient.from("contracheques").insert([{
-funcionario_uid:uid,
-competencia_mes:mes.value,
-competencia_ano:ano.value,
-salario_base:resultadoFinal.salario,
-base_inss:resultadoFinal.vencimentos,
-base_irrf:resultadoFinal.vencimentos,
-base_fgts:resultadoFinal.vencimentos,
-inss:resultadoFinal.valorINSS,
-irrf:resultadoFinal.valorIRRF,
-fgts:resultadoFinal.fgts,
-salario_liquido:resultadoFinal.liquido
-}])
-
-alert("Contracheque salvo")
-}
+/* ============================= */
+/* GERAR PDF */
+/* ============================= */
 
 function gerarPDF(){
 
-if(!resultadoFinal){
-alert("Calcule primeiro")
-return
+calcular()
+
+const elemento = document.getElementById("area-contracheque")
+
+html2pdf().set({
+margin:10,
+filename:"contracheque.pdf",
+html2canvas:{scale:2},
+jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}
+}).from(elemento).save()
+
 }
 
-html2pdf().from(areaPDF).save("contracheque.pdf")
+/* ============================= */
+/* VOLTAR */
+/* ============================= */
+
+function voltar(){
+window.history.back()
 }
 
 </script>
+
 </body>
 </html>
