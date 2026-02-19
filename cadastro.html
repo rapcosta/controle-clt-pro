@@ -122,33 +122,57 @@ button{
 <option value="Não">Não</option>
 <option value="Sim">Sim</option>
 </select>
-<textarea id="just_deficiencia" class="justificativa" placeholder="Descreva a deficiência..."></textarea>
+<textarea id="just_deficiencia" class="justificativa" placeholder="Tipo..."></textarea>
 </div>
 
+<!-- DEPENDENTES -->
 <div class="campo">
 <div class="campo">
 <label>Dependentes</label>
-<select onchange="toggleJustificativa(this,'just_dependentes')">
+
+<select onchange="toggleDependentes(this)">
 <option>Não</option>
 <option>Sim</option>
 </select>
 
+<input type="number"
+id="qtd_dependentes"
+class="justificativa"
+min="0"
+max="50"
+placeholder="Quantidade de dependentes">
+
 <textarea id="just_dependentes"
 class="justificativa"
-placeholder="Informe quantidade, nomes ou detalhes dos dependentes...">
+placeholder="Informe nomes ou detalhes dos dependentes...">
 </textarea>
+
 </div>
+
 
 </div>
 
 <!-- FILHOS -->
 <div class="campo">
 <label>Filhos (Salário Família)</label>
-<select onchange="toggleJustificativa(this,'just_filhos')">
+
+<select onchange="toggleFilhos(this)">
 <option>Não</option>
 <option>Sim</option>
 </select>
-<textarea id="just_filhos" class="justificativa" placeholder="Informações sobre filhos..."></textarea>
+
+<input type="number"
+id="qtd_filhos"
+class="justificativa"
+min="0"
+max="50"
+placeholder="Quantidade de filhos">
+
+<textarea id="just_filhos"
+class="justificativa"
+placeholder="Informações sobre os filhos...">
+</textarea>
+
 </div>
 
 </div>
