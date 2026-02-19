@@ -21,11 +21,6 @@
 
 <script>
 
-/* proteção login */
-if(localStorage.getItem("logado") !== "sim"){
-window.location="login.html"
-}
-
 const funcionarios = JSON.parse(localStorage.getItem("funcionarios")) || []
 const historico = JSON.parse(localStorage.getItem("contracheques")) || []
 
@@ -76,11 +71,10 @@ window.location="dashboard.html"
 carregar()
 
 </script>
+
 <script src="auth.js"></script>
 <script>
-window.addEventListener("DOMContentLoaded", () => {
-protegerPagina()
-})
+window.addEventListener("DOMContentLoaded", protegerPagina)
 </script>
 
 </body>
