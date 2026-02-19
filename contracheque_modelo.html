@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Contracheque</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:white;
+    margin:0;
+}
+
+.page{
+    width: 210mm;
+    min-height: 297mm;
+    padding:10mm;
+    margin:auto;
+}
+
+.contracheque{
+    border:2px solid black;
+    padding:10px;
+    margin-bottom:20px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    border-bottom:1px solid black;
+    padding-bottom:5px;
+    margin-bottom:8px;
+}
+
+.empresa{
+    font-weight:bold;
+    font-size:14px;
+}
+
+.periodo{
+    text-align:right;
+}
+
+.dados{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:4px;
+    font-size:12px;
+    margin-bottom:8px;
+}
+
+.dados div{
+    border:1px solid black;
+    padding:4px;
+}
+
+.tabela{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+}
+
+.tabela th,
+.tabela td{
+    border:1px solid black;
+    padding:4px;
+    text-align:center;
+}
+
+.totais{
+    margin-top:10px;
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:6px;
+    font-size:12px;
+}
+
+.totais div{
+    border:1px solid black;
+    padding:6px;
+}
+
+.liquido{
+    font-size:18px;
+    font-weight:bold;
+    text-align:center;
+    border:2px solid black;
+    padding:10px;
+    margin-top:10px;
+}
+
+.assinatura{
+    margin-top:40px;
+    text-align:center;
+}
+
+hr{
+    border:1px dashed black;
+    margin:30px 0;
+}
+
+@media print{
+    hr{
+        page-break-after:always;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<!-- VIA FUNCIONÁRIO -->
+<div class="contracheque">
+
+<div class="header">
+<div class="empresa">
+FACILITE SERVIÇOS & TERCEIRIZAÇÃO
+</div>
+
+<div class="periodo">
+Mês/Ano: <span id="mesAno1"></span>
+</div>
+</div>
+
+<div class="dados">
+<div>Nome: <span id="nome1"></span></div>
+<div>CPF: <span id="cpf1"></span></div>
+<div>Cargo: <span id="cargo1"></span></div>
+<div>Unidade: <span id="unidade1"></span></div>
+
+<div>Admissão: <span id="admissao1"></span></div>
+<div>Matrícula: <span id="matricula1"></span></div>
+<div>Salário Base: R$ <span id="salario1"></span></div>
+<div>Dependentes IR: <span id="dep1"></span></div>
+</div>
+
+<table class="tabela">
+<thead>
+<tr>
+<th>Cód</th>
+<th>Descrição</th>
+<th>Ref</th>
+<th>Vencimentos R$</th>
+<th>Descontos R$</th>
+</tr>
+</thead>
+
+<tbody id="tabelaEventos1"></tbody>
+</table>
+
+<div class="totais">
+<div>Total Vencimentos: R$ <span id="totalVenc1"></span></div>
+<div>Total Descontos: R$ <span id="totalDesc1"></span></div>
+<div>Base INSS: R$ <span id="baseINSS1"></span></div>
+<div>Base FGTS: R$ <span id="baseFGTS1"></span></div>
+</div>
+
+<div class="liquido">
+LÍQUIDO A RECEBER: R$ <span id="liquido1"></span>
+</div>
+
+<div class="assinatura">
+____________________________________  
+Assinatura do Funcionário
+</div>
+
+</div>
+
+<hr>
+
+<!-- VIA EMPRESA -->
+<div class="contracheque">
+
+<div class="header">
+<div class="empresa">
+FACILITE SERVIÇOS & TERCEIRIZAÇÃO
+</div>
+
+<div class="periodo">
+Mês/Ano: <span id="mesAno2"></span>
+</div>
+</div>
+
+<div class="dados">
+<div>Nome: <span id="nome2"></span></div>
+<div>CPF: <span id="cpf2"></span></div>
+<div>Cargo: <span id="cargo2"></span></div>
+<div>Unidade: <span id="unidade2"></span></div>
+
+<div>Admissão: <span id="admissao2"></span></div>
+<div>Matrícula: <span id="matricula2"></span></div>
+<div>Salário Base: R$ <span id="salario2"></span></div>
+<div>Dependentes IR: <span id="dep2"></span></div>
+</div>
+
+<table class="tabela">
+<thead>
+<tr>
+<th>Cód</th>
+<th>Descrição</th>
+<th>Ref</th>
+<th>Vencimentos R$</th>
+<th>Descontos R$</th>
+</tr>
+</thead>
+
+<tbody id="tabelaEventos2"></tbody>
+</table>
+
+<div class="totais">
+<div>Total Vencimentos: R$ <span id="totalVenc2"></span></div>
+<div>Total Descontos: R$ <span id="totalDesc2"></span></div>
+<div>Base INSS: R$ <span id="baseINSS2"></span></div>
+<div>Base FGTS: R$ <span id="baseFGTS2"></span></div>
+</div>
+
+<div class="liquido">
+LÍQUIDO A RECEBER: R$ <span id="liquido2"></span>
+</div>
+
+<div class="assinatura">
+____________________________________  
+Assinatura do Funcionário
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
