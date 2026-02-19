@@ -175,18 +175,15 @@ document.getElementById("r_liquido").innerText = liquido.toFixed(2)
 
 function gerarPDF(){
 
-calcular()
+    const mes = document.getElementById("mes").value
+    const ano = document.getElementById("ano").value
 
-const elemento = document.getElementById("area-contracheque")
-
-html2pdf().set({
-margin:10,
-filename:"contracheque.pdf",
-html2canvas:{scale:2},
-jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}
-}).from(elemento).save()
-
+    window.open(
+        `contracheque_modelo.html?uid=${uid}&mes=${mes}&ano=${ano}`,
+        "_blank"
+    )
 }
+
 
 /* ============================= */
 /* VOLTAR */

@@ -204,3 +204,8 @@ function preencherTabela(id, eventos){
 }
 
 carregar()
+
+setTimeout(()=>{
+    window.print()
+}, 1000)
+
